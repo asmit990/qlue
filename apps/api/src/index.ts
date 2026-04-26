@@ -1,31 +1,51 @@
 import express, { Request, Response } from "express";
-import { generateSQL } from "../src/services/gemini";
-
+import http from "http";
+import { WebSocketServer } from "ws";
+import db from "./services/database";
+import { generateSQL } from "./services/gemini";
+import queryRouter from "./routes/query";
+import cors from "cors";
 
 const app = express();
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
+
+// Middlewares
 app.use(express.json());
+app.use(cors());
 
-app.get("/", (req: Request, res: Response) => {
- 
+// HTTP Routes
+app.get("/", (_req: Request, res: Response) => {
+  res.send("Qlue API running 🚀");
 });
 
-app.post("/ask", (req: Request, res: Response) => {
+app.use("/api", queryRouter);
 
-})
+// WebSocket
+wss.on("connection", (ws) => {
+  console.log("✅ Client connected");
 
-app.patch("/history", (req: Request, res:Response) => {
-    
+  ws.on("message", async (message) => {
+    const { question, schema } = JSON.parse(message.toString());
 
-})
+    try {
+      ws.send(JSON.stringify({ status: "thinking" }));
 
-app.post("/api/query", async (req, res) => {
-  const { question } = req.body;
+      const { sql, chartType } = await generateSQL(question, schema);
+      ws.send(JSON.stringify({ status: "querying", sql }));
 
-  const sql = await generateSQL(question);
-  console.log("Generated SQL:", sql); // pehle bas yahi dekh
+      const rows = db.prepare(sql).all();
+      ws.send(JSON.stringify({ status: "done", rows, chartType, sql }));
 
-  res.json({ sql }); // frontend pe bhej
+    } catch (err: any) {
+      ws.send(JSON.stringify({ status: "error", error: err.message }));
+    }
+  });
+
+  ws.on("close", () => console.log("❌ Client disconnected"));
 });
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+
+// Start
+server.listen(3000, () => {
+  console.log("🚀 Qlue server running on port 3000");
 });
