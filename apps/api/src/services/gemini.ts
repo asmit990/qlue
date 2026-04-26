@@ -1,43 +1,42 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from "dotenv";
+import dotenv from "dotenv"
+import type { ChartType, QueryResponse } from "../types";
 
-dotenv.config();
+dotenv.config()
 
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.GEMINI_API_KEY
 
-if (!apiKey) {
-  throw new Error("GEMINI_API_KEY is missing in .env");
-}
+if (!apiKey) throw new Error("GEMINI_API_KEY is missing in .env");
+
+
 
 const genAI = new GoogleGenerativeAI(apiKey);
 
 
+export async function generateSQL(userQuery: string, schema: string): Promise<QueryResponse> {
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+   
+  const prompt = `
+   You are a SQL and data visualization expert.
+Given this database schema:
+${schema}
 
-const DB_SCHEMA =  `
-Tables:
-
- - sales(id, product_name, region, revenue, sale_date, category)
- - employees(id, employee_name, salary, domain)
- - domain(id, budget_allocation, domain_name)
- 
-`;
-
-export async function generateSQL(userQuery: string) {
-    
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-const prompt = `
-You are a SQL expert. Given this database schema:
-${DB_SCHEMA}
-
-Convert this natural language query to SQLite SQL:
-"${userQuery}"
-
-Return ONLY the SQL query, nothing else. No explanation, no markdown.
-`;
-
-
-const result = await model.generateContent(prompt)
-const sql = result.response.text().trim();
-return sql;
+For this query: "${userQuery}"
+Return ONLY a valid JSON object, nothing else. No explanation, no markdown, no backticks:
+{
+  "sql": "SELECT ...",
+  "chartType": "bar"
 }
+
+chartType rules:
+- "bar"  → comparisons, rankings, categories
+- "line" → trends over time, dates
+- "pie"  → percentages, parts of a whole
+
+  `
+const result = await model.generateContent(prompt)
+const text = result.response.text().trim()
+const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
+return parsed;
+}
+
