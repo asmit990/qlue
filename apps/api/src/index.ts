@@ -26,21 +26,18 @@ wss.on("connection", (ws) => {
   console.log("✅ Client connected");
 
   ws.on("message", async (message) => {
+  try {
     const { question, schema } = JSON.parse(message.toString());
-
-    try {
-      ws.send(JSON.stringify({ status: "thinking" }));
-
-      const { sql, chartType } = await generateSQL(question, schema);
-      ws.send(JSON.stringify({ status: "querying", sql }));
-
-      const rows = db.prepare(sql).all();
-      ws.send(JSON.stringify({ status: "done", rows, chartType, sql }));
-
-    } catch (err: any) {
-      ws.send(JSON.stringify({ status: "error", error: err.message }));
-    }
-  });
+    ws.send(JSON.stringify({ status: "thinking" }));
+    const { sql, chartType } = await generateSQL(question, schema);
+    ws.send(JSON.stringify({ status: "querying", sql }));
+    const rows = db.prepare(sql).all();
+    ws.send(JSON.stringify({ status: "done", rows, chartType, sql }));
+  } catch (err: any) {
+    ws.send(JSON.stringify({ status: "error", error: err.message }));
+    console.error("WS Error:", err.message); // ← exact error dekho
+  }
+});
 
   ws.on("close", () => console.log("❌ Client disconnected"));
 });

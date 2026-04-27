@@ -28,16 +28,17 @@ r.post("/upload", u.single("file"), (req:Request, res: Response) => {
           .replace(/\s+/g, "_")
           .toLowerCase();
        const colDefs = columns.map((c) => `"${c}" TEXT`).join(", ");
+db.exec(`CREATE TABLE IF NOT EXISTS "${tableName}" (${colDefs})`); // pehle table
+
+const placeholders = columns.map(() => "?").join(", ");
+const insert = db.prepare(`INSERT INTO "${tableName}" VALUES (${placeholders})`);
+results.forEach((row) => insert.run(...Object.values(row))); // phir insert
+console.log("Table created:", tableName);
+currentSchema = `Tables:\n- ${tableName}(${columns.join(", ")})`;
+db.exec(`CREATE TABLE IF NOT EXISTS _meta (key TEXT PRIMARY KEY, value TEXT)`);
+db.prepare(`INSERT OR REPLACE INTO _meta VALUES ('schema', ?)`).run(currentSchema);
 
 
-       currentSchema = `Tables:\n- ${tableName}(${columns.join(", ")})`;
-
-
-       db.exec(`CREATE TABLE IF NOT EXISTS _meta (key TEXT PRIMARY KEY, value TEXT)`);
-       db.prepare(`INSERT OR REPLACE INTO _meta VALUES ('schema', ?)`).run(currentSchema);
-        const placeholders = columns.map(() => "?").join(", ");
-        const insert = db.prepare(`INSERT INTO "${tableName}" VALUES (${placeholders})`);
-        results.forEach((row) => insert.run(...Object.values(row)));
 
        if(results.length === 0 ) { 
         console.log( " empty") 
