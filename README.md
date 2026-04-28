@@ -1,10 +1,4 @@
-Bhai, yeh raha tera full professional **README.md** file. Isko directly copy kar aur apne project root mein `README.md` file bana ke paste kar de. 
 
-Maine isme **Architecture Diagram** (ASCII) aur **Project Structure** bhi daal diya hai taaki recruiter ko dekh ke hi lage ki tune dhang se plan kiya hai.
-
----
-
-```markdown
 # 🔍 Qlue | Conversational Business Intelligence
 
 **Qlue** is a full-stack, AI-powered data visualization engine that transforms natural language prompts into interactive business dashboards. No SQL, no complex BI tools—just ask your data a question and get instant visual insights.
