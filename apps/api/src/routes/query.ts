@@ -4,6 +4,7 @@ import csv from "csv-parser";
 import fs from "fs";
 import db from "../services/database";
 import { generateSQL } from "../services/gemini";
+import { authenticateToken } from "../auth/middleware";
 
 const r = Router()
 const u = multer({dest: "uploads/"})
@@ -11,7 +12,7 @@ const u = multer({dest: "uploads/"})
 
 let currentSchema = ""
 
-r.post("/upload", u.single("file"), (req:Request, res: Response) => {
+r.post("/upload", authenticateToken, u.single("file"), (req:Request, res: Response) => {
     const results: any[] = []
     
     fs.createReadStream(req.file!.path)
@@ -55,7 +56,7 @@ db.prepare(`INSERT OR REPLACE INTO _meta VALUES ('schema', ?)`).run(currentSchem
 
 
 
-r.post("/query" , async (req: Request, res: Response) => {
+r.post("/query" , authenticateToken, async (req: Request, res: Response) => {
   const { question , schema } = req.body;
   const activeSchema = schema || currentSchema;
   if (!activeSchema) {

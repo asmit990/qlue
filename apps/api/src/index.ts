@@ -4,6 +4,7 @@ import { WebSocketServer } from "ws";
 import db from "./services/database";
 import { generateSQL } from "./services/gemini";
 import queryRouter from "./routes/query";
+import authRouter from "./auth/router";
 import cors from "cors";
 
 const app = express();
@@ -19,6 +20,7 @@ app.get("/", (_req: Request, res: Response) => {
   res.send("Qlue API running 🚀");
 });
 
+app.use("/api/auth", authRouter);
 app.use("/api", queryRouter);
 
 // WebSocket
