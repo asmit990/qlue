@@ -80,7 +80,7 @@ In most companies, data is locked behind technical barriers. Non-technical stake
 ### 2. Installation
 ```bash
 # Clone the repository
-git clone [https://github.com/yourusername/qlue.git](https://github.com/yourusername/qlue.git)
+git clone [https://github.com/asmit990/qlue.git](https://github.com/asmit990/qlue.git)
 cd qlue
 
 # Install dependencies for server
@@ -112,11 +112,9 @@ npm run dev
 This is a personal project used to demonstrate the power of LLMs in Business Intelligence. Feel free to fork and experiment!
 
 ---
-Developed by [Your Name]
+Developed by asmit
 ```
 
----
 
-Bhai, isme `[Your Name]` aur `yourusername` ki jagah apni details daal dena. Ye README dekh kar koi bhi senior dev impress ho jayega ki tune logic, architecture aur documentation teeno pe kaam kiya hai.
 
-**Ab bol, backend ka code likhna shuru karein?**
+
