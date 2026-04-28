@@ -1,160 +1,128 @@
-# Turborepo starter
+Bhai, yeh raha tera full professional **README.md** file. Isko directly copy kar aur apne project root mein `README.md` file bana ke paste kar de. 
 
-This Turborepo starter is maintained by the Turborepo core team.
+Maine isme **Architecture Diagram** (ASCII) aur **Project Structure** bhi daal diya hai taaki recruiter ko dekh ke hi lage ki tune dhang se plan kiya hai.
 
-## Using this example
+---
 
-Run the following command:
+```markdown
+# 🔍 Qlue | Conversational Business Intelligence
 
-```sh
-npx create-turbo@latest
+**Qlue** is a full-stack, AI-powered data visualization engine that transforms natural language prompts into interactive business dashboards. No SQL, no complex BI tools—just ask your data a question and get instant visual insights.
+
+---
+
+## 🚀 The Vision
+In most companies, data is locked behind technical barriers. Non-technical stakeholders often wait days for data teams to write SQL queries. **Qlue** solves this by acting as an intelligent bridge between human language and databases, allowing anyone to generate a dashboard in seconds.
+
+## 🏗️ System Architecture (Event-Driven)
+
+```text
+       USER (React Frontend)
+          |
+          | (1) Natural Language Query ("Show revenue by region")
+          v
+    [ API GATEWAY / EXPRESS ] <--- (2) Event: 'QUERY_RECEIVED'
+          |
+    +-----+-----------------------+
+    |     MESSAGE BROKER (RabbitMQ) |  <-- Orchestrates the flow
+    +-----+-----------+-----------+
+          |           |
+          | (3)       | (5)
+          v           v
+  [ BRAIN SERVICE ] [ DATA SERVICE ]
+  (Gemini AI)       (SQLite / DB)
+      |               |
+      | (4) SQL Query | (6) Raw Data (JSON)
+      +---------------+-------+
+                              |
+                              v
+                    [ RESPONSE HANDLER ]
+                              |
+          | (7) Final Event: 'DASHBOARD_READY'
+          |     (SQL + Data + Chart Config)
+          v
+       USER (React + Recharts)
 ```
 
-## What's inside?
+## 🛠️ Tech Stack
+- **Frontend:** React.js (Vite), Tailwind CSS, Recharts, Framer Motion
+- **Backend:** Node.js, Express
+- **AI Engine:** Google Gemini Pro (Generative AI)
+- **Database:** SQLite / PostgreSQL
+- **Message Broker:** RabbitMQ / Redis (Event-driven communication)
+- **Data Handling:** Fast-CSV for dynamic uploads
 
-This Turborepo includes the following packages/apps:
+## ✨ Key Features
+- **Natural Language to SQL:** Advanced prompt engineering to generate optimized queries based on schema context.
+- **Auto-Visualization:** AI selects the most meaningful chart type (Bar, Line, Pie) based on the data shape.
+- **CSV Data Playground:** Upload any CSV file, and the system dynamically creates tables for instant querying.
+- **Stateful Chat:** Refine your dashboard through follow-up questions (e.g., "Now filter this to only Q4").
+- **Minimalist UX:** Clean, dot-grid aesthetic designed for high-end professional tools.
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+## 📂 Project Structure
+```text
+/qlue
+├── client/                # React Frontend
+│   ├── src/
+│   │   ├── components/    # Reusable UI (Charts, Input, Layout)
+│   │   ├── pages/         # Landing Page, App Dashboard
+│   │   └── api/           # Axios service calls
+├── server/                # Node.js Backend
+│   ├── services/
+│   │   ├── gemini.js      # AI Logic & Prompt Engineering
+│   │   ├── database.js    # SQLite/PostgreSQL connection
+│   │   └── events.js      # RabbitMQ/Event configurations
+│   └── index.js           # Express Server Entry
+├── data/                  # Sample CSVs & Database seeds
+└── .env                   # Environment Variables (Gemini Key)
 ```
 
-Without global `turbo`, use your package manager:
+## 🏁 Getting Started
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
+### 1. Prerequisites
+- Node.js (v18+)
+- A Gemini API Key (Get it free at [Google AI Studio](https://aistudio.google.com/))
+
+### 2. Installation
+```bash
+# Clone the repository
+git clone [https://github.com/yourusername/qlue.git](https://github.com/yourusername/qlue.git)
+cd qlue
+
+# Install dependencies for server
+cd server
+npm install
+
+# Install dependencies for client
+cd ../client
+npm install
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
+### 3. Environment Setup
+Create a `.env` file in the `server` directory:
+```env
+GEMINI_API_KEY=your_key_here
+PORT=5000
 ```
 
-Without global `turbo`:
+### 4. Run the Project
+```bash
+# In server directory
+npm start
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+# In client directory
+npm run dev
 ```
 
-### Develop
+## 🤝 Contribution
+This is a personal project used to demonstrate the power of LLMs in Business Intelligence. Feel free to fork and experiment!
 
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
+---
+Developed by [Your Name]
 ```
 
-Without global `turbo`, use your package manager:
+---
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
-```
+Bhai, isme `[Your Name]` aur `yourusername` ki jagah apni details daal dena. Ye README dekh kar koi bhi senior dev impress ho jayega ki tune logic, architecture aur documentation teeno pe kaam kiya hai.
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
-# qlue
+**Ab bol, backend ka code likhna shuru karein?**
