@@ -10,33 +10,6 @@ In most companies, data is locked behind technical barriers. Non-technical stake
 
 ## 🏗️ System Architecture (Event-Driven)
 
-```text
-       USER (React Frontend)
-          |
-          | (1) Natural Language Query ("Show revenue by region")
-          v
-    [ API GATEWAY / EXPRESS ] <--- (2) Event: 'QUERY_RECEIVED'
-          |
-    +-----+-----------------------+
-    |     MESSAGE BROKER (RabbitMQ) |  <-- Orchestrates the flow
-    +-----+-----------+-----------+
-          |           |
-          | (3)       | (5)
-          v           v
-  [ BRAIN SERVICE ] [ DATA SERVICE ]
-  (Gemini AI)       (SQLite / DB)
-      |               |
-      | (4) SQL Query | (6) Raw Data (JSON)
-      +---------------+-------+
-                              |
-                              v
-                    [ RESPONSE HANDLER ]
-                              |
-          | (7) Final Event: 'DASHBOARD_READY'
-          |     (SQL + Data + Chart Config)
-          v
-       USER (React + Recharts)
-```
 
 ## 🛠️ Tech Stack
 - **Frontend:** React.js (Vite), Tailwind CSS, Recharts, Framer Motion
