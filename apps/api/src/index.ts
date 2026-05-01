@@ -1,11 +1,13 @@
 import express, { Request, Response } from "express";
 import http from "http";
 import { WebSocketServer } from "ws";
-import db from "./services/database";
-import { generateSQL } from "./services/gemini";
+import cors from "cors";
+import { v4 as uuid } from 'uuid';
 import queryRouter from "./routes/query";
 import authRouter from "./auth/router";
-import cors from "cors";
+import { connectRabbitMQ } from "../src/messageBroker/connection";
+import { startWorker } from "../src/messageBroker/worker";
+import { publishQuery } from "../src/messageBroker/producer";
 
 const app = express();
 const server = http.createServer(app);
@@ -17,34 +19,30 @@ app.use(cors());
 
 // HTTP Routes
 app.get("/", (_req: Request, res: Response) => {
-  res.send("Qlue API running 🚀");
+  res.send("Qlue API running");
 });
 
 app.use("/api/auth", authRouter);
 app.use("/api", queryRouter);
 
+// Start RabbitMQ + Worker
+await connectRabbitMQ();
+startWorker(wss);
+
 // WebSocket
-wss.on("connection", (ws) => {
-  console.log("✅ Client connected");
+wss.on("connection", (ws: any) => {
+  ws.jobId = uuid();
+  console.log("Client connected:", ws.jobId);
 
-  ws.on("message", async (message) => {
-  try {
+  ws.on("message", async (message: any) => {
     const { question, schema } = JSON.parse(message.toString());
-    ws.send(JSON.stringify({ status: "thinking" }));
-    const { sql, chartType } = await generateSQL(question, schema);
-    ws.send(JSON.stringify({ status: "querying", sql }));
-    const rows = db.prepare(sql).all();
-    ws.send(JSON.stringify({ status: "done", rows, chartType, sql }));
-  } catch (err: any) {
-    ws.send(JSON.stringify({ status: "error", error: err.message }));
-    console.error("WS Error:", err.message); // ← exact error dekho
-  }
-});
+    publishQuery(ws.jobId, question, schema);
+  });
 
-  ws.on("close", () => console.log("❌ Client disconnected"));
+  ws.on("close", () => console.log("Client disconnected:", ws.jobId));
 });
 
 // Start
 server.listen(3000, () => {
-  console.log("🚀 Qlue server running on port 3000");
+  console.log("Qlue server running on port 3000");
 });
