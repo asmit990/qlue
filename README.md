@@ -9,9 +9,7 @@
 In most companies, data is locked behind technical barriers. Non-technical stakeholders often wait days for data teams to write SQL queries. **Qlue** solves this by acting as an intelligent bridge between human language and databases, allowing anyone to generate a dashboard in seconds.
 
 ## 🏗️ System Architecture (Event-Driven)
-<p align="center">
-  <img src="" alt="Qlue Logo" width="120" />
-</p>
+
 
 ![Description](qlue_system_workflow.svg)
 
