@@ -10,9 +10,10 @@ In most companies, data is locked behind technical barriers. Non-technical stake
 
 ## 🏗️ System Architecture (Event-Driven)
 <p align="center">
-  <img src="qlue_system_workflow.svg" alt="Qlue Logo" width="120" />
+  <img src="" alt="Qlue Logo" width="120" />
 </p>
 
+![Description](qlue_system_workflow.svg)
 
 ## 🛠️ Tech Stack
 - **Frontend:** React.js (Vite), Tailwind CSS, Recharts, Framer Motion
