@@ -5,19 +5,17 @@ import cors from "cors";
 import { v4 as uuid } from 'uuid';
 import queryRouter from "./routes/query";
 import authRouter from "./auth/router";
-import { connectRabbitMQ } from "../src/messageBroker/connection";
-import { startWorker } from "../src/messageBroker/worker";
-import { publishQuery } from "../src/messageBroker/producer";
+import { connectRabbitMQ } from "./messageBroker/connection";
+import { startWorker } from "./messageBroker/worker";
+import { publishQuery } from "./messageBroker/producer";
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
-// Middlewares
 app.use(express.json());
 app.use(cors());
 
-// HTTP Routes
 app.get("/", (_req: Request, res: Response) => {
   res.send("Qlue API running");
 });
@@ -25,11 +23,6 @@ app.get("/", (_req: Request, res: Response) => {
 app.use("/api/auth", authRouter);
 app.use("/api", queryRouter);
 
-// Start RabbitMQ + Worker
-await connectRabbitMQ();
-startWorker(wss);
-
-// WebSocket
 wss.on("connection", (ws: any) => {
   ws.jobId = uuid();
   console.log("Client connected:", ws.jobId);
@@ -42,7 +35,12 @@ wss.on("connection", (ws: any) => {
   ws.on("close", () => console.log("Client disconnected:", ws.jobId));
 });
 
-// Start
-server.listen(3000, () => {
-  console.log("Qlue server running on port 3000");
-});
+async function main() {
+  await connectRabbitMQ();
+  startWorker(wss);
+  server.listen(3000, () => {
+    console.log("Qlue server running on port 3000");
+  });
+}
+
+main().catch(console.error);

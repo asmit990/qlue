@@ -16,7 +16,9 @@ export const startWorker = (wss: WebSocketServer) => {
         console.log("job is done: ", jobId)
 
         const client = [...wss.clients].find((ws: any) => ws.jobId === jobId);
-
+console.log("Looking for jobId:", jobId);
+console.log("Connected clients:", [...wss.clients].map((ws: any) => ws.jobId));
+console.log("Client found:", !!client);
         try {
            client?.send(JSON.stringify({ status: 'thinking' }));
 
@@ -26,12 +28,26 @@ export const startWorker = (wss: WebSocketServer) => {
 
            const rows = db.prepare(sql).all();
 
+
+         db.prepare(`
+          INSERT INTO query_history (question, sql, chart_type)
+         VALUES (?, ?, ?)
+         `).run(question, sql, chartType);
+
+          client?.send(JSON.stringify({ status: 'done', rows, chartType, sql }));
+// ye teen lines hatao
+       console.log("Looking for jobId:", jobId);
+       console.log("Connected clients:", [...wss.clients].map((ws: any) => ws.jobId));
+      console.log("Client found:", !!client);
            client?.send(JSON.stringify({ status: 'done', rows, chartType, sql }));
         }
-        catch(err: any) {
-            client?.send(JSON.stringify({ status: 'error', error: err.message }));
+       
+            catch(err: any) {
+  console.error("Worker error:", err.message); // ← ye add karo
+  client?.send(JSON.stringify({ status: 'error', error: err.message }));
+}
 
-        }
+        
 
           channel.ack(msg);
     })

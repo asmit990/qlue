@@ -16,6 +16,9 @@ export default function CsvUploadButton({ onUpload }: Props) {
     const res = await fetch("http://localhost:3000/api/upload", {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     });
 
     const data = await res.json();

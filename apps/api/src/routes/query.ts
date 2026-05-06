@@ -28,6 +28,11 @@ r.post("/upload", authenticateToken, u.single("file"), (req:Request, res: Respon
           .replace(".csv", "")
           .replace(/\s+/g, "_")
           .toLowerCase();
+          
+              
+      if (!/^[a-zA-Z0-9_]+$/.test(tableName)) {
+         throw new Error("Invalid table name");
+      }
        const colDefs = columns.map((c) => `"${c}" TEXT`).join(", ");
 db.exec(`CREATE TABLE IF NOT EXISTS "${tableName}" (${colDefs})`); // pehle table
 
@@ -44,7 +49,6 @@ db.prepare(`INSERT OR REPLACE INTO _meta VALUES ('schema', ?)`).run(currentSchem
        if(results.length === 0 ) { 
         console.log( " empty") 
         return}
-      
 
         fs.unlinkSync(req.file!.path);
 
@@ -66,11 +70,33 @@ r.post("/query" , authenticateToken, async (req: Request, res: Response) => {
   try {
     const { sql, chartType } = await generateSQL(question, activeSchema);
     const rows = db.prepare(sql).all();
-    res.json({ rows, chartType, sql });
+
+
+db.prepare(`
+  INSERT INTO query_history (question, sql, chart_type)
+  VALUES (?, ?, ?)
+`).run(question, sql, chartType);
+
+res.json({ rows, chartType, sql });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 
 })
+
+
+
+r.get("/queryhistory", authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const history = db.prepare(`
+      SELECT * FROM query_history 
+      ORDER BY created_at DESC 
+      LIMIT 20
+    `).all();
+    res.json({ history });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 export default r ;

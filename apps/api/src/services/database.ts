@@ -9,4 +9,14 @@ db.exec(`
   )
 `);
 
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS query_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    question TEXT,
+    sql TEXT,
+    chart_type TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  )
+`);
 export default db;
