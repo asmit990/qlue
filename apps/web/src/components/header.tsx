@@ -1,32 +1,27 @@
-import { useNavigate, useLocation } from "react-router-dom";
+     
+import React from "react"
+import { useNavigate } from "react-router-dom"
 
 export default function Header() {
-  const navigate = useNavigate();
-  const location = useLocation();
 
-  const isHome = location.pathname === "/";
+const navigate = useNavigate();
+  <>
+  
+ {/* 2. Top Navigation Bar */}
+      <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center justify-between px-10">
+        <span
+  onClick={() => navigate("/")}
+  className="text-3xl font-extrabold tracking-tighter uppercase"
+>
+  Qlue
+</span>
+        <div className="flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
+          <a onClick={ () => navigate("/about")} className="hover:text-black transition-colors">About</a>
+          <a onClick={ () => navigate("/register")} className="px-5 py-2 border border-black text-black hover:bg-black hover:text-white transition-all">
+            Register
+          </a>
+        </div>
+      </nav>
+  </>
 
-  return (
-    <nav className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-10 py-6">
-      <span className="text-lg font-bold tracking-tight text-black">
-        Qlue
-      </span>
-
-      <div className="flex items-center gap-8 text-sm text-gray-500">
-        <button
-          onClick={() => navigate("/about")}
-          className="transition-colors hover:text-black"
-        >
-          About
-        </button>
-
-        <button
-          onClick={() => navigate(isHome ? "/ask" : "/")}
-          className="rounded-full bg-black px-5 py-2 text-sm text-white transition-colors hover:bg-gray-800"
-        >
-          {isHome ? "Get Started" : "Go Home"}
-        </button>
-      </div>
-    </nav>
-  );
 }

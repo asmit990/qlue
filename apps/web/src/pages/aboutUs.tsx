@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import CardTilt from "@/components/cardTilt";
 
 /**
  * Qlue About Page - Editorial Grid Edition
@@ -18,8 +19,8 @@ export default function AboutUs() {
       ></div>
 
       {/* 2. Top Nav */}
-      <nav className="relative z-20 h-24 border-b border-black bg-white flex items-center justify-between px-12">
-        <div className="text-3xl font-extrabold tracking-tighter uppercase">Qlue</div>
+      <nav className="relative z-20 h-24 border-b border-black bg-white/70 backdrop-blur-sm flex items-center justify-between px-6 md:px-12">
+        <div className="text-3xl font-extrabold tracking-tighter uppercase ">Qlue</div>
         <div className="flex items-center gap-10 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">
           <a href="/" className="hover:text-black transition-colors">Home</a>
           <a href="/register" className="bg-black text-white px-8 py-3 hover:bg-gray-800 transition-all">Get Started</a>
@@ -54,35 +55,44 @@ export default function AboutUs() {
         </section>
 
         {/* 4. Features Grid - Modular Cells */}
-        <section className="grid grid-cols-1 md:grid-cols-3 border-b border-black">
+        <section className="grid grid-cols-1 md:grid-cols-3 border-b border-black ">
+          <CardTilt >
           <FeatureCell 
             number="01" 
             title="Natural Language First" 
             desc="Type what you want to know—Qlue figures out the rest. No query language, no configuration."
             className="md:border-r border-black"
           />
+          </CardTilt>
+          <CardTilt>
           <FeatureCell 
             number="02" 
             title="AI-Powered SQL" 
             desc="Gemini reads your data schema and writes precise queries so the charts are always accurate."
             className="md:border-r border-black"
           />
+          </CardTilt>
+          <CardTilt>
           <FeatureCell 
             number="03" 
             title="Bring Your Data" 
             desc="Upload any CSV and start asking questions immediately. No formatting, no migration."
           />
+           </CardTilt>
         </section>
+       
 
         {/* 5. Mission & Credits Split */}
+        
         <section className="flex flex-col lg:flex-row flex-1">
+           <CardTilt>
           <div className="flex-1 p-12 lg:p-24 border-r border-black bg-black text-white flex flex-col justify-between">
             <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-gray-600 mb-12">The Mission</h2>
             <p className="text-3xl md:text-5xl font-black tracking-tighter leading-[0.95] uppercase italic">
               Closing the gap between <span className="text-gray-500">having data</span> and <span className="text-white underline decoration-4 underline-offset-8">understanding it</span>.
             </p>
           </div>
-
+</CardTilt>
           <div className="flex-[0.6] p-12 lg:p-24 flex flex-col justify-end bg-white/40 backdrop-blur-sm">
             <div className="space-y-1">
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Architect</span>

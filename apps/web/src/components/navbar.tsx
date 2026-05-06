@@ -31,3 +31,15 @@ export default function Navbar() {
     </div>
   );
 }
+
+
+
+
+
+//       <nav className="relative z-20 h-24 border-b border-black bg-white flex items-center justify-between px-12">
+ //       <div className="text-3xl font-extrabold tracking-tighter uppercase">Qlue</div>
+ //       <div className="flex items-center gap-10 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">
+ //         <a href="/" className="hover:text-black transition-colors">Home</a>
+ //         <a href="/register" className="bg-black text-white px-8 py-3 hover:bg-gray-800 transition-all">Get Started</a>
+ //       </div>
+ //     </nav> 
