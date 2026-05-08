@@ -39,18 +39,26 @@ export default function Landing() {
       <div className="absolute bottom-0 right-[-20%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(255,0,182,.15),rgba(255,255,255,0))] pointer-events-none -z-10" />
 
       {/* Nav */}
-      <nav className="relative z-20 h-24 border-b border-black bg-white/70 backdrop-blur-sm flex items-center justify-between px-6 md:px-12">
-        <div className="text-3xl font-extrabold tracking-tighter uppercase">Qlue</div>
-        <div className="flex items-center gap-8 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">
-          <button onClick={() => navigate("/about")} className="hover:text-black transition-colors">Protocol</button>
-          <button
-            onClick={() => navigate("/ask")}
-            className="bg-black text-white px-8 py-3 hover:bg-gray-800 transition-all border border-black"
-          >
-            Initialize
-          </button>
-        </div>
-      </nav>
+ <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center px-10">
+  <div className="text-xl font-extrabold tracking-tighter uppercase">
+    Qlue
+  </div>
+
+  <div className="absolute right-9 flex items-center gap-8 text-[11px] font-black  tracking-[0.2em] text-gray-400">
+    <button
+      onClick={() => navigate("/about")}
+      className="hover:text-black transition-colors"
+    >
+      about
+    </button>
+
+    <button
+      onClick={() => navigate("/ask")}
+      className="px-3 py-3 border border-black text-black hover:bg-black hover:text-white  transition-all" >
+      Initialize
+    </button>
+  </div>
+</nav>
 
       <main className="relative z-10 flex-1 flex flex-col">
 

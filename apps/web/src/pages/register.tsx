@@ -1,11 +1,12 @@
 import Register from "@/components/register";
-
+import { useNavigate } from "react-router-dom";
 
 
 
   export default  function RegisterPage() {
+    const navi = useNavigate()
     if (localStorage.getItem("user")) {
-      window.location.href = "/ask"; // Redirect to /ask if already registered
+       () => {navi("/ask")}
       return null; // Render nothing while redirecting
     }
   return (

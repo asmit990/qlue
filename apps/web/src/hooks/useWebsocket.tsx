@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react"
-
+import { useChartStore } from "@/store/chartStore";
 export function useWebSocket() {
     const ws = useRef<WebSocket | null>(null)
-    const [status, setStatus] = useState<"idle" | "thinking" | "querying" | "done" | "error">("idle");
-    const [rows, setRows] = useState<any[]>([]);
-    const [chartType, setChartType] = useState("bar");
+     const chartStore = useChartStore();
+    const { setRows, setChartType, setStatus } = chartStore;
     const [sql, setSql] = useState("");
+    const status = chartStore.status;
+    const rows = chartStore.rows;
+    const chartType = chartStore.chartType;
 
     useEffect(() => {
         function connect() {
@@ -39,14 +41,27 @@ export function useWebSocket() {
         return () => ws.current?.close();
     }, []);
 
-    function ask(question: string, schema: string) {
-        if (ws.current?.readyState !== WebSocket.OPEN) {
-            console.log("WebSocket not open, readyState:", ws.current?.readyState);
-            return;
-        }
-        setStatus("thinking");
-        ws.current.send(JSON.stringify({ question, schema }));
+function ask(question: string, schema: string) {
+  if (ws.current?.readyState === WebSocket.OPEN) {
+    setStatus("thinking");
+    ws.current.send(JSON.stringify({ question, schema }));
+    return;
+  }
+
+  // wait karo connection ke liye
+  console.log("Waiting for WebSocket...");
+  const interval = setInterval(() => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      clearInterval(interval);
+      setStatus("thinking");
+      ws.current.send(JSON.stringify({ question, schema }));
+    }
+  }, 100);
+
+  // 5 seconds baad timeout
+  setTimeout(() => clearInterval(interval), 5000);
     }
 
-    return { ask, status, rows, chartType, sql };
+
+    return { ask, status, rows, chartType, sql }; 
 }

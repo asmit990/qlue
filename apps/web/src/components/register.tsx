@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-
+import { useNavigate } from "react-router-dom";
 export default function Register() {
   const [msg, setMsg] = useState<{ text: string; type: "error" | "success" | "info" } | null>(null);
   const [form, setForm] = useState({
@@ -17,6 +17,7 @@ export default function Register() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const navi = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMsg(null);
@@ -44,7 +45,7 @@ export default function Register() {
 
       if (res.ok) {
         setMsg({ text: "Account created! Redirecting...", type: "success" });
-        setTimeout(() => window.location.href = "/login", 1500);
+        setTimeout(() => window.location.href = "/ask", 1500);
       } else {
         setMsg({ text: data.error || "Registration failed.", type: "error" });
       }
@@ -66,9 +67,9 @@ export default function Register() {
       />
 
       <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center justify-between px-10">
-        <div className="text-3xl font-extrabold tracking-tighter uppercase">Qlue</div>
+        <div  onClick={() => navi("/")} className="text-xl font-extrabold tracking-tighter uppercase">Qlue</div>
         <div className="flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
-          <a href="#" className="hover:text-black transition-colors">About</a>
+          <a onClick={() => navi("/about")} className="hover:text-black transition-colors">About</a>
           <a href="/login" className="px-5 py-2 border border-black text-black hover:bg-black hover:text-white transition-all">Sign In</a>
         </div>
       </nav>

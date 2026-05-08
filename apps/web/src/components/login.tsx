@@ -72,14 +72,14 @@ export default function Login() {
       <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center justify-between px-10">
         <span
   onClick={() => navigate("/")}
-  className="text-3xl font-extrabold tracking-tighter uppercase"
+  className="text-xl font-extrabold tracking-tighter uppercase"
 >
   Qlue
 </span>
-        <div className="flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
-          <a href="/" className="hover:text-black transition-colors">About</a>
+        <div className="flex items-center gap-8 text-[10px] font-bold  tracking-[0.2em] text-gray-500">
+          <a href="/" className="hover:text-black transition-colors">about</a>
           <a href="/register" className="px-5 py-2 border border-black text-black hover:bg-black hover:text-white transition-all">
-            Register
+            REGISTER
           </a>
         </div>
       </nav>

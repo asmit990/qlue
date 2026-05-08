@@ -1,12 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 import CardTilt from "@/components/cardTilt";
-
+import { useNavigate } from "react-router-dom";
 /**
  * Qlue About Page - Editorial Grid Edition
  * Matches the heavy sans-serif from Screenshot 2026-05-06 at 5.23.43 AM.png
  */
 export default function AboutUs() {
+  const navi = useNavigate()
   return (
     <div className="min-h-screen w-full bg-white text-black font-sans flex flex-col selection:bg-black selection:text-white">
       {/* 1. Diamond-Dot Canvas Background */}
@@ -19,11 +20,10 @@ export default function AboutUs() {
       ></div>
 
       {/* 2. Top Nav */}
-      <nav className="relative z-20 h-24 border-b border-black bg-white/70 backdrop-blur-sm flex items-center justify-between px-6 md:px-12">
-        <div className="text-3xl font-extrabold tracking-tighter uppercase ">Qlue</div>
-        <div className="flex items-center gap-10 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">
-          <a href="/" className="hover:text-black transition-colors">Home</a>
-          <a href="/register" className="bg-black text-white px-8 py-3 hover:bg-gray-800 transition-all">Get Started</a>
+         <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center justify-between px-10">
+        <div className="text-xl font-extrabold tracking-tighter ">Qlue</div>
+        <div className="flex items-center gap-8 text-[10px] font-bold  tracking-[0.2em] text-gray-500">
+        <a onClick={() => {navi("/login")}} className="px-5 py-2 border border-black text-black hover:bg-black hover:text-white transition-all">Sign In</a>
         </div>
       </nav>
 
