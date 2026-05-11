@@ -28,7 +28,7 @@ Express API  ------>  RabbitMQ Queue  ------>  Worker
                                          Recharts Dashboard
 ```
 
-Full architecture diagram: see `qlue_system_workflow.svg`
+Full architecture diagram: see ![Description](qlue_system_workflow.svg)
 
 ---
 
