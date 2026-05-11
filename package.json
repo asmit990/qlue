@@ -1,5 +1,5 @@
 {
-  "name": "backendproject",
+  "name": "qlue",
   "private": true,
   "scripts": {
     "build": "turbo run build",
