@@ -1,95 +1,186 @@
+# Qlue — Conversational Business Intelligence
 
-# 🔍 Qlue | Conversational Business Intelligence
-
-**Qlue** is a full-stack, AI-powered data visualization engine that transforms natural language prompts into interactive business dashboards. No SQL, no complex BI tools—just ask your data a question and get instant visual insights.
+Qlue is a full-stack, AI-powered data visualization engine that transforms natural language prompts into interactive business dashboards. No SQL, no complex BI tools — just ask your data a question and get instant visual insights.
 
 ---
 
-## 🚀 The Vision
-In most companies, data is locked behind technical barriers. Non-technical stakeholders often wait days for data teams to write SQL queries. **Qlue** solves this by acting as an intelligent bridge between human language and databases, allowing anyone to generate a dashboard in seconds.
+## The Problem
 
-## 🏗️ System Architecture (Event-Driven)
+In most companies, data is locked behind technical barriers. Non-technical stakeholders wait days for data teams to write SQL queries and configure dashboards. Qlue eliminates this bottleneck by acting as an intelligent bridge between human language and databases, allowing anyone to generate a dashboard in seconds.
 
+---
 
-![Description](qlue_system_workflow.svg)
+## System Architecture
 
-## 🛠️ Tech Stack
-- **Frontend:** React.js (Vite), Tailwind CSS, Recharts, Framer Motion
-- **Backend:** Node.js, Express
-- **AI Engine:** Google Gemini Pro (Generative AI)
-- **Database:** SQLite / PostgreSQL
-- **Message Broker:** RabbitMQ / Redis (Event-driven communication)
-- **Data Handling:** Fast-CSV for dynamic uploads
-
-## ✨ Key Features
-- **Natural Language to SQL:** Advanced prompt engineering to generate optimized queries based on schema context.
-- **Auto-Visualization:** AI selects the most meaningful chart type (Bar, Line, Pie) based on the data shape.
-- **CSV Data Playground:** Upload any CSV file, and the system dynamically creates tables for instant querying.
-- **Stateful Chat:** Refine your dashboard through follow-up questions (e.g., "Now filter this to only Q4").
-- **Minimalist UX:** Clean, dot-grid aesthetic designed for high-end professional tools.
-
-## 📂 Project Structure
-```text
-/qlue
-├── client/                # React Frontend
-│   ├── src/
-│   │   ├── components/    # Reusable UI (Charts, Input, Layout)
-│   │   ├── pages/         # Landing Page, App Dashboard
-│   │   └── api/           # Axios service calls
-├── server/                # Node.js Backend
-│   ├── services/
-│   │   ├── gemini.js      # AI Logic & Prompt Engineering
-│   │   ├── database.js    # SQLite/PostgreSQL connection
-│   │   └── events.js      # RabbitMQ/Event configurations
-│   └── index.js           # Express Server Entry
-├── data/                  # Sample CSVs & Database seeds
-└── .env                   # Environment Variables (Gemini Key)
+```
+React Frontend
+      |
+      | Natural language query (WebSocket)
+      v
+Express API  ------>  RabbitMQ Queue  ------>  Worker
+                                                  |
+                                          Gemini API (NL -> SQL)
+                                                  |
+                                              SQLite DB
+                                                  |
+                                          WebSocket response
+                                                  |
+                                         Recharts Dashboard
 ```
 
-## 🏁 Getting Started
+Full architecture diagram: see `qlue_system_workflow.svg`
 
-### 1. Prerequisites
-- Node.js (v18+)
-- A Gemini API Key (Get it free at [Google AI Studio](https://aistudio.google.com/))
+---
 
-### 2. Installation
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React.js (Vite), Tailwind CSS, Recharts, Framer Motion |
+| Backend | Node.js, Express, TypeScript |
+| AI Engine | Google Gemini 2.5 Flash |
+| Database | SQLite (dynamic CSV-backed tables) |
+| Message Broker | RabbitMQ (concurrent query handling) |
+| Realtime | WebSocket (live status streaming) |
+| Auth | JWT, bcrypt |
+| Data Ingestion | multer, csv-parser |
+| Monorepo | Turborepo, pnpm |
+
+---
+
+## Key Features
+
+**Natural Language to SQL**
+Advanced prompt engineering with schema context passed to Gemini to generate optimized SQLite queries. The AI understands table relationships and column semantics without any manual configuration.
+
+**Auto-Visualization**
+Gemini selects the most appropriate chart type (Bar, Line, Area, Pie, Scatter, Radar) based on the data shape and query intent — no manual chart configuration required.
+
+**CSV Data Playground**
+Upload any CSV file and the system dynamically creates SQLite tables for instant querying. Zero setup, zero schema definition.
+
+**Concurrent Query Queue**
+RabbitMQ queues all incoming user queries so multiple users are handled reliably without rate-limit crashes or request collisions.
+
+**Live Status Streaming**
+WebSocket streams real-time status updates (thinking, querying, done) back to the UI as each job progresses through the pipeline.
+
+**Query History Sidebar**
+ChatGPT-style hover sidebar tracks all previous queries grouped by date. Click any entry to re-run it instantly.
+
+**Authentication**
+Full JWT-based auth system with register, login, forgot password, and email-based password reset via nodemailer.
+
+---
+
+## Project Structure
+
+```
+qlue/
+  apps/
+    api/
+      src/
+        routes/           query.ts          upload + query HTTP routes
+        services/         gemini.ts         AI logic + prompt engineering
+                          database.ts       SQLite connection
+        rabbitmq/         connection.ts     RabbitMQ setup
+                          producer.ts       publish jobs to queue
+                          worker.ts         consume + process jobs
+                          queue.ts          queue name constants
+        auth/             router.ts         auth routes
+                          controller.ts     register, login, reset
+                          service.ts        business logic
+                          middleware.ts     JWT verification
+        index.ts                            Express + WebSocket server
+
+    web/
+      src/
+        components/       Chart.tsx         Recharts wrapper (6 chart types)
+                          QuerySidebar.tsx  hover history sidebar
+                          CsvUploadButton   file upload
+                          ProtectedRoute    auth guard
+        hooks/            useWebSocket.ts   WebSocket + Zustand
+        store/            chartStore.ts     Zustand global state
+        pages/            Landing.tsx
+                          Ask.tsx
+                          Dashboard.tsx
+                          Register.tsx
+                          Login.tsx
+                          ForgetPassword.tsx
+                          ResetPassword.tsx
+                          AboutUs.tsx
+
+  .env                                      environment variables
+  turbo.json                                turborepo config
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js v18+
+- pnpm
+- Docker (for RabbitMQ)
+- Google Gemini API key — free at aistudio.google.com
+
+### Installation
+
 ```bash
-# Clone the repository
-git clone [https://github.com/asmit990/qlue.git](https://github.com/asmit990/qlue.git)
+git clone https://github.com/asmit990/qlue.git
 cd qlue
-
-# Install dependencies for server
-cd server
-npm install
-
-# Install dependencies for client
-cd ../client
-npm install
+pnpm install
 ```
 
-### 3. Environment Setup
-Create a `.env` file in the `server` directory:
+### Environment Setup
+
+Create `.env` in `apps/api`:
+
 ```env
 GEMINI_API_KEY=your_key_here
-PORT=5000
+JWT_SECRET=your_jwt_secret
+RABBITMQ_URL=amqp://localhost
+EMAIL=your_gmail@gmail.com
+EMAIL_PASSWORD=your_app_password
+PORT=3000
 ```
 
-### 4. Run the Project
+### Start RabbitMQ
+
 ```bash
-# In server directory
-npm start
-
-# In client directory
-npm run dev
+docker run -d --name rabbitmq \
+  -p 5672:5672 \
+  -p 15672:15672 \
+  rabbitmq:3-management
 ```
 
-## 🤝 Contribution
-This is a personal project used to demonstrate the power of LLMs in Business Intelligence. Feel free to fork and experiment!
+### Run
+
+```bash
+# API
+cd apps/api && pnpm dev
+
+# Frontend
+cd apps/web && pnpm dev
+```
 
 ---
-Developed by asmit
-```
 
+## How It Works
 
+1. User uploads a CSV file — the system auto-creates a SQLite table from the file
+2. User types a natural language query — sent via WebSocket to the backend
+3. Query is published to RabbitMQ queue
+4. Worker picks up the job, calls Gemini with the DB schema as context
+5. Gemini returns SQL + recommended chart type
+6. SQL runs against SQLite, rows are returned
+7. WebSocket streams the result back to React
+8. Recharts renders the dashboard instantly
 
+---
+
+## Developed by
+
+Asmit Pandey — github.com/asmit990
 
