@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 export default function Ask() {
   const [schema, setSchema] = useState("");
   const [question, setQuestion] = useState("");
-
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
   return (
@@ -26,9 +26,9 @@ export default function Ask() {
       />
 
       {/* Navbar */}
-      <nav className="relative z-20 h-16 border-b border-black bg-white flex items-center justify-between px-6 md:px-12 text-[10px] font-black uppercase tracking-[0.3em]">
+      <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center justify-between px-10">
         <div className="flex items-center gap-4">
-          <span className="text-xl tracking-tighter">Qlue</span>
+          <span onClick={() => {navigate("/")}} className=" font-extrabold text-xl tracking-tighter">Qlue</span>
           <span className="text-gray-300 hidden md:inline">///</span>
           <span className="text-gray-400 hidden md:inline">
             Workspace
@@ -37,19 +37,22 @@ export default function Ask() {
 
         <div className="flex items-center gap-6">
           {schema ? (
-            <span className="text-green-500">Schema Active</span>
+            <span className="text-extrasmall text-green-500">Schema Active</span>
           ) : (
             <span className="text-red-500 animate-pulse">
               Awaiting Schema
             </span>
           )}
 
-          <a
-            href="/"
-            className="hover:text-gray-500 transition-colors"
-          >
-            Exit
-          </a>
+        <button
+      onClick={() => {
+     localStorage.removeItem("token");
+     navigate("/");
+     }}
+     className="hover:text-gray-500 transition-colors"
+       >
+     Log Out
+    </button>
         </div>
       </nav>
 

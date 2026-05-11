@@ -43,11 +43,11 @@ export default function Login() {
 
       const data = await res.json();
 
-      if (res.ok) {
-        setMsg({ text: "Access granted. Initializing...", type: "success" });
-        // Redirect to dashboard or home after successful login
-        setTimeout(() => window.location.href = "/dashboard", 1500);
-      } else {
+     if (res.ok) {
+  localStorage.setItem("token", data.token); // ← ye hona chahiye
+  setMsg({ text: "Access granted. Initializing...", type: "success" });
+  setTimeout(() => window.location.href = "/ask", 1500);
+} else {
         setMsg({ text: data.error || "Authentication failed.", type: "error" });
       }
     } catch {
@@ -72,7 +72,7 @@ export default function Login() {
       <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center justify-between px-10">
         <span
   onClick={() => navigate("/")}
-  className="text-xl font-extrabold tracking-tighter uppercase"
+  className="text-xl font-extrabold tracking-tighter "
 >
   Qlue
 </span>
@@ -155,6 +155,7 @@ export default function Login() {
                 />
               </div>
 
+             
               <button
                 type="submit"
                 disabled={loading}
@@ -166,6 +167,20 @@ export default function Login() {
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                   </span>
                 )}
+              </button>
+
+             
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full h-16  text-grey text-[11px] font-bold uppercase tracking-[0.3em] transition-all flex items-center justify-center group disabled:bg-gray-400"
+              >
+               
+                  <span onClick={() => {navigate("/forgetpassword")}} className="flex items-center gap-2">
+                    forget password
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </span>
+                
               </button>
             </form>
 

@@ -28,10 +28,15 @@ Return ONLY a valid JSON object, nothing else. No explanation, no markdown, no b
   "chartType": "bar"
 }
 
-chartType rules:
-- "bar"  → comparisons, rankings, categories
-- "line" → trends over time, dates
-- "pie"  → percentages, parts of a whole
+chartType must be one of:
+// bar, line, area, pie, scatter, radar
+//
+// - bar     → comparisons, rankings
+// - line    → trends over time
+// - area    → cumulative trends
+// - pie     → parts of a whole
+// - scatter → correlation between two values
+// - radar   → multi-dimension comparison
 
   `
 const result = await model.generateContent(prompt)

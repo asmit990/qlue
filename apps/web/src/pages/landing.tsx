@@ -40,7 +40,7 @@ export default function Landing() {
 
       {/* Nav */}
  <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center px-10">
-  <div className="text-xl font-extrabold tracking-tighter uppercase">
+  <div className="text-xl font-extrabold tracking-tighter ">
     Qlue
   </div>
 

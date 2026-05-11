@@ -36,8 +36,11 @@ export default function Register() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          name: form.fullName,
+          email: form.email,
           username: form.username,
           password: form.password,
+          confirm: form.confirm,
         }),
       });
 
@@ -67,7 +70,7 @@ export default function Register() {
       />
 
       <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center justify-between px-10">
-        <div  onClick={() => navi("/")} className="text-xl font-extrabold tracking-tighter uppercase">Qlue</div>
+        <div  onClick={() => navi("/")} className="text-xl font-extrabold tracking-tighter ">Qlue</div>
         <div className="flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
           <a onClick={() => navi("/about")} className="hover:text-black transition-colors">About</a>
           <a href="/login" className="px-5 py-2 border border-black text-black hover:bg-black hover:text-white transition-all">Sign In</a>

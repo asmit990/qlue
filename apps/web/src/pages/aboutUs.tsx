@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
  * Matches the heavy sans-serif from Screenshot 2026-05-06 at 5.23.43 AM.png
  */
 export default function AboutUs() {
+  const token = localStorage.getItem("token");
   const navi = useNavigate()
   return (
     <div className="min-h-screen w-full bg-white text-black font-sans flex flex-col selection:bg-black selection:text-white">
@@ -21,9 +22,9 @@ export default function AboutUs() {
 
       {/* 2. Top Nav */}
          <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center justify-between px-10">
-        <div className="text-xl font-extrabold tracking-tighter ">Qlue</div>
+        <div onClick={() => {navi("/")}} className="text-xl font-extrabold tracking-tighter ">Qlue</div>
         <div className="flex items-center gap-8 text-[10px] font-bold  tracking-[0.2em] text-gray-500">
-        <a onClick={() => {navi("/login")}} className="px-5 py-2 border border-black text-black hover:bg-black hover:text-white transition-all">Sign In</a>
+        <a onClick={() => { if(token) {navi("/ask")} else {navi("/login")}}} className="px-5 py-2 border border-black text-black hover:bg-black hover:text-white transition-all">Sign In</a>
         </div>
       </nav>
 

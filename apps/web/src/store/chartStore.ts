@@ -2,14 +2,15 @@ import { create } from "zustand"
 
 type Status = "thinking" | "querying" | "done" | "error" | ""
 
+export type ChartType = "bar" | "line" | "pie" | "area" | "scatter" | "radar";
 
 interface ChartState {
   rows: any[];
-  chartType: "bar" | "line" | "pie";
+  chartType: ChartType;
   status: Status;
 
   setRows: (rows: any[]) => void;
-  setChartType: (type: "bar" | "line" | "pie") => void;
+  setChartType: (type: ChartType) => void;
   setStatus: (status: Status) => void;
 }
 

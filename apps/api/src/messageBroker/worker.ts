@@ -13,12 +13,8 @@ export const startWorker = (wss: WebSocketServer) => {
 
 
         const { jobId, question, schema} = JSON.parse(msg.content.toString())
-        console.log("job is done: ", jobId)
 
         const client = [...wss.clients].find((ws: any) => ws.jobId === jobId);
-console.log("Looking for jobId:", jobId);
-console.log("Connected clients:", [...wss.clients].map((ws: any) => ws.jobId));
-console.log("Client found:", !!client);
         try {
            client?.send(JSON.stringify({ status: 'thinking' }));
 
@@ -35,11 +31,6 @@ console.log("Client found:", !!client);
          `).run(question, sql, chartType);
 
           client?.send(JSON.stringify({ status: 'done', rows, chartType, sql }));
-// ye teen lines hatao
-       console.log("Looking for jobId:", jobId);
-       console.log("Connected clients:", [...wss.clients].map((ws: any) => ws.jobId));
-      console.log("Client found:", !!client);
-           client?.send(JSON.stringify({ status: 'done', rows, chartType, sql }));
         }
        
             catch(err: any) {
