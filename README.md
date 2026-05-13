@@ -20,7 +20,6 @@ In most companies, data is locked behind technical barriers. Non-technical stake
   <source src="https://raw.githubusercontent.com/asmit990/qlue/main/demo.mp4" type="video/mp4">
 </video>
 
-
 ## System Architecture
 
 ```
