@@ -13,12 +13,9 @@ In most companies, data is locked behind technical barriers. Non-technical stake
 
 
 ## Demo Video
-  
 
+[![Demo Video](https://cdn.loom.com/sessions/thumbnails/26bce6e4005446c784e8d1ab5e4179ca-with-play.gif)](https://www.loom.com/share/26bce6e4005446c784e8d1ab5e4179ca)
 
-<video controls width="100%">
-  <source src="https://raw.githubusercontent.com/asmit990/qlue/main/demo.mp4" type="video/mp4">
-</video>
 
 ## System Architecture
 
