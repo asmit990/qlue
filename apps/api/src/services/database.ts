@@ -1,26 +1,27 @@
-import Database from "better-sqlite3";
-const db = new Database("qlue.db");
+import { pool } from "../connections//dbconnection";
 
-
-db.exec(`
+await pool.query(`
   CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
     name TEXT,
     email TEXT UNIQUE,
     reset_token TEXT,
-    reset_token_expiry INTEGER
-  )
+    reset_token_expiry BIGINT
+  );
 `);
 
-db.exec(`
+await pool.query(`
   CREATE TABLE IF NOT EXISTS query_history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     question TEXT,
     sql TEXT,
     chart_type TEXT,
-    created_at TEXT DEFAULT (datetime('now'))
-  )
+    created_at TIMESTAMP DEFAULT NOW()
+  );
 `);
-export default db;
+
+
+
+export default pool;
