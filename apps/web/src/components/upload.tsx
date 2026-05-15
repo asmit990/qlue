@@ -13,7 +13,7 @@ export default function CsvUploadButton({ onUpload }: Props) {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("http://localhost:3000/api/upload", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/upload`, {
       method: "POST",
       body: formData,
       headers: {

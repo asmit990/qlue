@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {  useParams, useNavigate, Navigate } from "react-router-dom";
+import React, { useState } from "react";
+import {  useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 /**

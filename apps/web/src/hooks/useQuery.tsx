@@ -15,7 +15,7 @@ export function useQuery() {
         setError(null)
 
         try {
-      const res = await axios.post("http://localhost:3000/api/query", { question})
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/query`, { question})
       setRows(res.data.rows || [])
       setChartType(res.data.chartType || "bar") 
 

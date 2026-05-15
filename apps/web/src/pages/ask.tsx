@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 export default function Ask() {
   const [schema, setSchema] = useState("");
   const [question, setQuestion] = useState("");
-  const token = localStorage.getItem("token");
+
   const navigate = useNavigate();
 
   return (
