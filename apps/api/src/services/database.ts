@@ -1,4 +1,6 @@
-import { pool } from "../connections//dbconnection";
+
+import { pool } from "../connections/dbconnection";
+
 
 await pool.query(`
   CREATE TABLE IF NOT EXISTS users (
@@ -21,6 +23,7 @@ await pool.query(`
     created_at TIMESTAMP DEFAULT NOW()
   );
 `);
+
 
 
 
