@@ -1,5 +1,5 @@
 {
-  "installCommand": "corepack enable && corepack prepare pnpm@9.0.0 --activate && pnpm install",
+  "installCommand": "npm install -g pnpm@9.0.0 && pnpm install --no-frozen-lockfile",
   "buildCommand": "turbo run build --filter=web",
   "outputDirectory": "apps/web/dist",
   "framework": null
