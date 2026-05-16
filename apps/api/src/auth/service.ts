@@ -130,8 +130,11 @@ export const forgetPassword = async (
     throw new Error("User not found");
   }
  // eamil 
+try {
+
+
  await transporter.sendMail({
-  from: `"Qlue Systems" <ab7817001@smtp-brevo.com>`,
+  from: `"Qlue Systems" <asmit@asmit.fun>`,
   to: email,
   subject: "ACTION REQUIRED // Protocol Override — Qlue",
   html: `
@@ -194,7 +197,11 @@ export const forgetPassword = async (
     </div>
   `,
 });
-
+}
+catch (error) {
+   console.error("sendMail failed:", error); // check server logs
+  throw new Error("Failed to send email");
+}
   return {
     success: true,
   };
