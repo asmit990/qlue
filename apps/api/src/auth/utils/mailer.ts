@@ -1,5 +1,13 @@
-import { Resend } from "resend";
+// utils/mailer.js
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+import nodemailer from "nodemailer";
 
-export default resend;
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
+
+export default transporter;

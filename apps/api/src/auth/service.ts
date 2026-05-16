@@ -129,8 +129,8 @@ export const forgetPassword = async (
   if (result.rows.length === 0) {
     throw new Error("User not found");
   }
-
- await resend.emails.send({
+ // eamil 
+ await transporter.sendMail({
   from: `"Qlue Systems" <${process.env.EMAIL}>`,
   to: email,
   subject: "ACTION REQUIRED // Protocol Override — Qlue",
