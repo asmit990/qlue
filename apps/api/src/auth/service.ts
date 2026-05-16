@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import transporter from "./utils/mailer";
 import pool from "../services/database";
-import resend from "./utils/mailer";
+
 
 const JWT_SECRET =
   process.env.JWT_SECRET 
