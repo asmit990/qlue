@@ -3,10 +3,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import transporter from "./utils/mailer";
 import pool from "../services/database";
+import resend from "./utils/mailer";
 
 const JWT_SECRET =
-  process.env.JWT_SECRET || "qlue-super-secret";
-
+  process.env.JWT_SECRET 
 export const registerUser = async (
   name: string,
   email: string,
@@ -130,7 +130,7 @@ export const forgetPassword = async (
     throw new Error("User not found");
   }
 
- await transporter.sendMail({
+ await resend.emails.send({
   from: `"Qlue Systems" <${process.env.EMAIL}>`,
   to: email,
   subject: "ACTION REQUIRED // Protocol Override — Qlue",
