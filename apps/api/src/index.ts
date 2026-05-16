@@ -24,6 +24,11 @@ app.use("/api/auth", authRouter);
 
 app.use("/api", queryRouter);
 
+app.get("/myip", async (req, res) => {
+  const response = await fetch("https://api.ipify.org?format=json");
+  const data = await response.json();
+  res.json(data);
+});
 wss.on("connection", (ws: any) => {
   ws.jobId = uuid();
   console.log("Client connected:", ws.jobId);
