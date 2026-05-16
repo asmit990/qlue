@@ -130,23 +130,70 @@ export const forgetPassword = async (
     throw new Error("User not found");
   }
 
-  await transporter.sendMail({
-    from: `"Qlue Systems" <${process.env.EMAIL}>`,
-    to: email,
-    subject: "Password Reset Protocol — Qlue",
+ await transporter.sendMail({
+  from: `"Qlue Systems" <${process.env.EMAIL}>`,
+  to: email,
+  subject: "ACTION REQUIRED // Protocol Override — Qlue",
+  html: `
+    <div style="background-color: #fafafa; padding: 40px 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+      <div style="max-width: 500px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e5e7eb;">
+        
+        <div style="border-bottom: 1px solid #e5e7eb; padding: 24px 32px;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td style="font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; color: #1a1a1a;">
+                Qlue
+              </td>
+              <td align="right" style="font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; color: #9ca3af;">
+                Node // Auth
+              </td>
+            </tr>
+          </table>
+        </div>
 
-    html: `
-      <h1>Password Reset</h1>
+        <div style="padding: 48px 32px;">
+          <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 4px; color: #9ca3af; margin-bottom: 24px;">
+            Security Alert
+          </div>
+          
+          <h1 style="margin: 0 0 24px 0; font-size: 40px; font-weight: 900; text-transform: uppercase; font-style: italic; line-height: 0.9; letter-spacing: -1px; color: #1a1a1a;">
+            Override<br>
+            <span style="-webkit-text-stroke: 1px #1a1a1a; color: white;">Protocol</span><br>
+            Initiated.
+          </h1>
+          
+          <p style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #6b7280; line-height: 2; margin: 0;">
+            A request was made to override the current access credentials for this node. If this was unauthorized, ignore this transmission. Otherwise, establish a new secure passphrase below.
+          </p>
 
-      <p>
-        Click below to reset your password:
-      </p>
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 40px;">
+            <tr>
+              <td align="center" bgcolor="#1a1a1a" style="border: 1px solid #1a1a1a;">
+                <a href="${process.env.FRONTEND_URL}/reset-password/${token}" style="display: block; padding: 20px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; color: #ffffff; text-decoration: none;">
+                  Execute Reset Sequence &rarr;
+                </a>
+              </td>
+            </tr>
+          </table>
+        </div>
 
-      <a href="${process.env.FRONTEND_URL}/reset-password/${token}">
-        Reset Password
-      </a>
-    `,
-  });
+        <div style="border-top: 1px solid #e5e7eb; padding: 20px 32px; background-color: #fafafa;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td style="font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #10b981;">
+                Uplink Stable
+              </td>
+              <td align="right" style="font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #9ca3af;">
+                &copy; 2026 Qlue
+              </td>
+            </tr>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  `,
+});
 
   return {
     success: true,
