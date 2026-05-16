@@ -131,7 +131,7 @@ export const forgetPassword = async (
   }
  // eamil 
  await transporter.sendMail({
-  from: `"Qlue Systems" <${process.env.EMAIL}>`,
+  from: `"Qlue Systems" <ab7817001@smtp-brevo.com>`,
   to: email,
   subject: "ACTION REQUIRED // Protocol Override — Qlue",
   html: `
