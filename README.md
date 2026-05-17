@@ -15,10 +15,7 @@ In most companies, data is locked behind technical barriers. Non-technical stake
 
 
 [![Watch the Demo](./thumbnail.png)](https://youtu.be/MHOpeayvVtk)>
-<<<<<<< HEAD
 
-=======
->>>>>>> 978499a (add: video)
 
 ## System Architecture
 
