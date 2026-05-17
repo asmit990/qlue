@@ -6,16 +6,16 @@ if (!process.env.BREVO_PASS) {
 
 const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false, // true only for port 465
+  port: 465,        
+  secure: true,     
   auth: {
-    user: process.env.BREVO_USER ?? "ab7817001@smtp-brevo.com", // move to env too
+    user: process.env.BREVO_USER ?? "ab7817001@smtp-brevo.com",
     pass: process.env.BREVO_PASS,
   },
-  pool: true,          // reuse connections instead of creating new ones each time
-  maxConnections: 5,   // Brevo free tier allows limited concurrent connections
-  rateDelta: 1000,     // ms between messages
-  rateLimit: 5,        // max messages per rateDelta window
+  pool: true,        
+  maxConnections: 5,  
+  rateDelta: 1000,    
+  rateLimit: 5,       
 });
 
 // Verify connection on startup (optional but helpful for debugging)
