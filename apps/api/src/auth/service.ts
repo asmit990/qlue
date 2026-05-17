@@ -134,7 +134,7 @@ try {
 
 
  await transporter.sendMail({
-  from: `"Qlue Systems" <asmit@asmit.fun>`,
+  from: `"Qlue Systems" <asmitpandey5848@gmail.com>`,
   to: email,
   subject: "ACTION REQUIRED // Protocol Override — Qlue",
   html: `

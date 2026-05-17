@@ -27,4 +27,8 @@ transporter.verify((error) => {
   }
 });
 
+transporter.on("error", (err) => {
+  console.error("Transporter error:", err);
+});
+
 export default transporter;
