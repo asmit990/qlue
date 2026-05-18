@@ -15,7 +15,6 @@ export default function Dashboard() {
 
   const { ask, status, rows, chartType, sql } = useWebSocket();
 
-  // Mapping logic for the visual guide
   const logicMatrix = [
     { type: "bar", label: "Comparisons & Rankings" },
     { type: "line", label: "Trends Over Time" },
@@ -24,6 +23,40 @@ export default function Dashboard() {
     { type: "scatter", label: "Correlation" },
     { type: "radar", label: "Multi-Dimension" },
   ];
+
+  // DATA EXTRACTION PROTOCOL (CSV Export Engine)
+  const handleExport = () => {
+    if (!rows || rows.length === 0) return;
+
+    // 1. Extract headers from keys
+    const headers = Object.keys(rows[0]);
+    
+    // 2. Map data rows to CSV strings
+    const csvRows = [
+      headers.join(","), // Header row
+      ...rows.map(row => 
+        headers.map(header => {
+          const val = row[header];
+          // Handle string fields with commas safely
+          return typeof val === "string" && val.includes(",") ? `"${val}"` : val;
+        }).join(",")
+      )
+    ].join("\n");
+
+    // 3. Generate secure download payload
+    const blob = new Blob([csvRows], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    
+    const timestamp = new Date().toISOString().slice(0, 10);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `qlue_matrix_${chartType}_${timestamp}.csv`);
+    link.style.visibility = "hidden";
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   useEffect(() => {
     if (!schema) {
@@ -132,8 +165,12 @@ export default function Dashboard() {
                     Protocol: {chartType} // {rows.length} Nodes Detected
                   </p>
                 </div>
-                <button className="text-[9px] font-black uppercase tracking-widest bg-black text-white px-4 py-2 hover:invert transition-all">
-                  Export
+                {/* Wired button up to data sequence */}
+                <button 
+                  onClick={handleExport}
+                  className="text-[9px] font-black uppercase tracking-widest bg-black text-white px-4 py-2 hover:invert transition-all active:scale-95"
+                >
+                  Extract Data
                 </button>
               </div>
 
