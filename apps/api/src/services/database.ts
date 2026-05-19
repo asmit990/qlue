@@ -16,6 +16,7 @@ async function initDB() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS query_history (
       id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       question TEXT,
       sql TEXT,
       chart_type TEXT,

@@ -13,7 +13,7 @@ if (!apiKey) throw new Error("GEMINI_API_KEY is missing in .env");
 const genAI = new GoogleGenerativeAI(apiKey);
 
 
-export async function generateSQL(userQuery: string, schema: string): Promise<QueryResponse> {
+export async function generateSQL(userQuery: string, schema: string, rows: any[]): Promise<QueryResponse> {
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
    
   const prompt = `

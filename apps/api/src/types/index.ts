@@ -1,6 +1,7 @@
 export type ChartType = "bar" | "line" | "pie";
 
 export interface QueryResponse {
+  answer: null;
   rows: Record<string, any>[];
   chartType: ChartType;
   sql: string;
