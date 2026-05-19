@@ -24,26 +24,26 @@ export default function Dashboard() {
     { type: "radar", label: "Multi-Dimension" },
   ];
 
-  // DATA EXTRACTION PROTOCOL (CSV Export Engine)
+
   const handleExport = () => {
     if (!rows || rows.length === 0) return;
 
-    // 1. Extract headers from keys
+
     const headers = Object.keys(rows[0]);
     
-    // 2. Map data rows to CSV strings
+
     const csvRows = [
-      headers.join(","), // Header row
+      headers.join(","), 
       ...rows.map(row => 
         headers.map(header => {
           const val = row[header];
-          // Handle string fields with commas safely
+   
           return typeof val === "string" && val.includes(",") ? `"${val}"` : val;
         }).join(",")
       )
     ].join("\n");
 
-    // 3. Generate secure download payload
+
     const blob = new Blob([csvRows], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");

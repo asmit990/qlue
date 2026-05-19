@@ -1,14 +1,11 @@
+import { Navigate } from "react-router-dom";
 import Register from "@/components/register";
-import { useNavigate } from "react-router-dom";
-
-
 
 export default function RegisterPage() {
-  const navi = useNavigate();
-  
-  if (localStorage.getItem("token")) {
-    navi("/ask");
-    return null;
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    return <Navigate to="/ask" replace />;
   }
 
   return <Register />;

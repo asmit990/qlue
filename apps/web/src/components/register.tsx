@@ -118,8 +118,8 @@ export default function Register() {
 
             <form onSubmit={handleSubmit} className="space-y-0">
               <div className="grid grid-cols-1 border-t border-l border-r border-gray-200">
-                <FullPageInput label="Full Name" name="fullName" placeholder="John Doe" value={form.fullName} onChange={handleChange} />
-                <FullPageInput label="Username" name="username" placeholder="j_doe_99" value={form.username} onChange={handleChange} />
+                <FullPageInput label="Full Name" name="fullName" placeholder="asmit" value={form.fullName} onChange={handleChange} />
+                <FullPageInput label="Username" name="username" placeholder="asmithuyaarlol" value={form.username} onChange={handleChange} />
                 <FullPageInput label="Email" name="email" type="email" placeholder="hello@qlue.ai" value={form.email} onChange={handleChange} />
                 <div className="grid grid-cols-2">
                   <FullPageInput label="Secret Key" name="password" type="password" placeholder="••••••••" value={form.password} onChange={handleChange} className="border-r" />
