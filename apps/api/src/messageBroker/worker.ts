@@ -26,7 +26,8 @@ export const startWorker = (wss: WebSocketServer) => {
 
       const { sql, chartType } = await generateSQL(
         question,
-        schema
+        schema,
+        jobId
       );
 
       client?.send(

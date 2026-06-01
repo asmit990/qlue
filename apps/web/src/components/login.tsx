@@ -185,8 +185,6 @@ export default function Login() {
             </form>
 
             <div className="mt-12 flex justify-between items-center text-[10px] text-gray-400 uppercase tracking-widest">
-              <a href="#" className="hover:text-black transition-colors underline underline-offset-4">Forgot Protocol?</a>
-              <a href="/register" className="hover:text-black transition-colors">Request Access</a>
             </div>
           </motion.div>
         </section>

@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-/**
- * Qlue Full-Page Password Recovery
- * Aesthetic: Square Editorial / Modular Grid
- */
+
 export default function ForgetPassword() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
