@@ -34,8 +34,8 @@ wss.on("connection", (ws: any) => {
   console.log("Client connected:", ws.jobId);
 
   ws.on("message", async (message: any) => {
-    const { question, schema } = JSON.parse(message.toString());
-    publishQuery(ws.jobId, question, schema);
+    const { question, schema, datasetId } = JSON.parse(message.toString());
+    publishQuery(ws.jobId, question, schema, datasetId);
   });
 
   ws.on("close", () => console.log("Client disconnected:", ws.jobId));

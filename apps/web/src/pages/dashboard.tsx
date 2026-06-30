@@ -11,6 +11,7 @@ export default function Dashboard() {
   const [sqlOpen, setSqlOpen] = useState(false);
 
   const schema = location.state?.schema;
+  const datasetId = location.state?.datasetId;
   const question = location.state?.question || "Show insights";
 
   const { ask, status, rows, chartType, sql } = useWebSocket();
@@ -59,11 +60,11 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    if (!schema) {
+    if (!schema || !datasetId) {
       navigate("/ask");
       return;
     }
-    ask(question, schema);
+    ask(question, schema, datasetId);
   }, []);
 
   return (

@@ -53,7 +53,7 @@ export default function ForgetPassword() {
 
       {/* 2. Top Navigation Bar */}
       <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center justify-between px-10">
-        <div className="text-3xl font-extrabold tracking-tighter uppercase">Qlue</div>
+        <div className="text-3xl font-extrabold tracking-tighter ">Qlue</div>
         <div className="flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
           <a href="/login" className="px-5 py-2 border border-black text-black hover:bg-black hover:text-white transition-all">
             Back to Login

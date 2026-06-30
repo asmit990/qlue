@@ -1,8 +1,6 @@
 export type ChartType = "bar" | "line" | "pie";
 
 export interface QueryResponse {
-  answer: null;
-  rows: Record<string, any>[];
   chartType: ChartType;
   sql: string;
 }
@@ -13,4 +11,11 @@ export interface UploadResponse {
   columns: string[];
   rowCount: number;
   schema: string;
+}
+
+export interface QueryHistoryEntry {
+  question: string;
+  sql: string;
+  chartType: string;
+  created_at: string;
 }

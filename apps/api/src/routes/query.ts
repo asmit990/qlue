@@ -1,169 +1,48 @@
 import { Router, Response, Request } from "express";
-import multer from "multer";
-import csv from "csv-parser";
-import fs from "fs";
-import pool from "../services/database";
-import { generateSQL } from "../services/gemini";
+import { v4 as uuidv4 } from "uuid";
 import { authenticateToken } from "../auth/middleware";
+import { getChannel } from "../messageBroker/connection";
+import { QueryHistoryEntry } from "../types";
+import pool from "../services/database";
 
 const r = Router();
 
-const u = multer({ dest: "uploads/" });
+export const queryHistoryStore = new Map<string, QueryHistoryEntry[]>();
+const MAXHISTORY = 20;
 
-// ── In-memory store for datasets (cleared on server restart) ──────────────────
-
-interface Dataset {
-  id: string;
-  user_id: string;
-  name: string;
-  schema: string;
-  rows: any[];
-  created_at: string;
+export function addToHistory(userId: string, entry: QueryHistoryEntry) {
+  const existing = queryHistoryStore.get(userId) || [];
+  existing.unshift(entry);
+  queryHistoryStore.set(userId, existing.slice(0, MAXHISTORY));
 }
-
-const datasetStore = new Map<string, Dataset>();
-let datasetCounter = 1;
-
-// ── Routes ────────────────────────────────────────────────────────────────────
-
-r.post(
-  "/upload",
-  authenticateToken,
-  u.single("file"),
-  async (req: Request, res: Response) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
-      }
-
-      const results: any[] = [];
-
-      fs.createReadStream(req.file.path)
-        .pipe(csv())
-        .on("data", (row) => results.push(row))
-        .on("end", () => {
-          try {
-            if (results.length === 0) {
-              fs.unlinkSync(req.file!.path);
-              return res.status(400).json({ error: "CSV is empty" });
-            }
-
-            const columns = Object.keys(results[0]);
-            const datasetName = req.file?.originalname || "dataset.csv";
-            const schema = `Tables:\n- data(${columns.join(", ")})\n`;
-            const userId = (req as any).user.id;
-
-            // Store dataset in memory only — never persisted to DB
-            const id = String(datasetCounter++);
-            datasetStore.set(id, {
-              id,
-              user_id: userId,
-              name: datasetName,
-              schema,
-              rows: results,
-              created_at: new Date().toISOString(),
-            });
-
-            fs.unlinkSync(req.file!.path);
-
-            return res.json({
-              success: true,
-              datasetId: id,
-              datasetName,
-              columns,
-              rowCount: results.length,
-              schema,
-            });
-          } catch (err: any) {
-            if (req.file && fs.existsSync(req.file.path)) {
-              fs.unlinkSync(req.file.path);
-            }
-            return res.status(500).json({ error: err.message });
-          }
-        });
-    } catch (err: any) {
-      return res.status(500).json({ error: err.message });
-    }
-  }
-);
 
 r.post(
   "/query",
   authenticateToken,
   async (req: Request, res: Response) => {
     try {
-      const { question, datasetId } = req.body;
+      const { question, schema } = req.body;
 
-      if (!question || !datasetId) {
+      if (!question || !schema) {
         return res.status(400).json({
-          error: "question and datasetId are required",
+          error: "question and schema are required",
         });
       }
 
       const userId = (req as any).user.id;
+      const jobId = uuidv4();
 
-      // Look up dataset from in-memory store
-      const dataset = datasetStore.get(String(datasetId));
-
-      if (!dataset || dataset.user_id !== userId) {
-        return res.status(404).json({ error: "Dataset not found" });
-      }
-
-      const aiResponse = await generateSQL(
-        question,
-        dataset.schema,
-        dataset.rows
-      );
-
-      // Save query history to DB, tied to the user
-      await pool.query(
-        `
-        INSERT INTO query_history
-          (user_id, question, sql, chart_type)
-        VALUES ($1, $2, $3, $4)
-        `,
-        [
-          userId,
-          question,
-          aiResponse.sql || "",
-          aiResponse.chartType || "",
-        ]
-      );
-
-      return res.json({
-        success: true,
-        answer: aiResponse.answer || null,
-        rows: aiResponse.rows || [],
-        sql: aiResponse.sql || "",
-        chartType: aiResponse.chartType || "",
-      });
-    } catch (err: any) {
-      return res.status(500).json({ error: err.message });
-    }
-  }
-);
-
-r.get(
-  "/datasets",
-  authenticateToken,
-  async (req: Request, res: Response) => {
-    try {
-      const userId = (req as any).user.id;
-
-      const datasets = [...datasetStore.values()]
-        .filter((d) => d.user_id === userId)
-        .sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      const channel = getChannel();
+      channel.sendToQueue(
+        "query_queue",
+        Buffer.from(
+          JSON.stringify({ jobId, question, schema, userId })
         )
-        .map(({ id, name, schema, created_at }) => ({
-          id,
-          name,
-          schema,
-          created_at,
-        }));
+      );
 
-      return res.json({ datasets });
+      // Client uses this jobId to tag its WebSocket connection
+      // (ws.jobId = jobId) so the worker can find it and stream status back.
+      return res.json({ success: true, jobId });
     } catch (err: any) {
       return res.status(500).json({ error: err.message });
     }
@@ -177,10 +56,9 @@ r.get(
     try {
       const userId = (req as any).user.id;
 
-      // Fetch only this user's query history from DB
       const result = await pool.query(
         `
-        SELECT *
+        SELECT question, sql, chart_type, created_at
         FROM query_history
         WHERE user_id = $1
         ORDER BY created_at DESC
@@ -190,30 +68,6 @@ r.get(
       );
 
       return res.json({ history: result.rows });
-    } catch (err: any) {
-      return res.status(500).json({ error: err.message });
-    }
-  }
-);
-
-r.delete(
-  "/dataset/:id",
-  authenticateToken,
-  async (req: Request, res: Response) => {
-    try {
-      const userId = (req as any).user.id;
-      const rawDatasetId = req.params.id;
-      const datasetId = Array.isArray(rawDatasetId)
-        ? rawDatasetId[0]
-        : rawDatasetId;
-
-      const dataset = datasetStore.get(datasetId);
-
-      if (dataset && dataset.user_id === userId) {
-        datasetStore.delete(datasetId);
-      }
-
-      return res.json({ success: true });
     } catch (err: any) {
       return res.status(500).json({ error: err.message });
     }

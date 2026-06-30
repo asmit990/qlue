@@ -10,6 +10,9 @@ export function useWebSocket() {
     const chartType = useChartStore((s) => s.chartType);
     
     useEffect(() => {
+        let isCleaningUp = false;
+        let reconnectTimeout: NodeJS.Timeout;
+
         function connect() {
             ws.current = new WebSocket(import.meta.env.VITE_WS_URL || "ws://localhost:3000");
 
@@ -32,8 +35,9 @@ export function useWebSocket() {
             };
 
             ws.current.onclose = () => {
+                if (isCleaningUp) return;
                 console.log("Disconnected — reconnecting in 2s...");
-                setTimeout(connect, 2000);
+                reconnectTimeout = setTimeout(connect, 2000);
             };
 
             ws.current.onerror = () => {
@@ -42,13 +46,20 @@ export function useWebSocket() {
         }
 
         connect();
-        return () => ws.current?.close();
+        
+        return () => {
+            isCleaningUp = true;
+            clearTimeout(reconnectTimeout);
+            if (ws.current?.readyState === WebSocket.OPEN || ws.current?.readyState === WebSocket.CONNECTING) {
+                ws.current.close();
+            }
+        };
     }, []);
 
-    function ask(question: string, schema: string) {
+    function ask(question: string, schema: string, datasetId: string) {
         if (ws.current?.readyState === WebSocket.OPEN) {
             useChartStore.getState().setStatus("thinking");
-            ws.current.send(JSON.stringify({ question, schema }));
+            ws.current.send(JSON.stringify({ question, schema, datasetId }));
             return;
         }
 
@@ -57,7 +68,7 @@ export function useWebSocket() {
             if (ws.current?.readyState === WebSocket.OPEN) {
                 clearInterval(interval);
                 useChartStore.getState().setStatus("thinking");
-                ws.current.send(JSON.stringify({ question, schema }));
+                ws.current.send(JSON.stringify({ question, schema, datasetId }));
             }
         }, 100);
 

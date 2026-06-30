@@ -1,7 +1,8 @@
 import { Upload } from "lucide-react";
+import { parseAndStoreCSV } from "@/lib/csvParser";
 
 interface Props {
-  onUpload: (schema: string) => void;
+  onUpload: (schema: string, datasetId: string) => void;
 }
 
 export default function CsvUploadButton({ onUpload }: Props) {
@@ -10,20 +11,16 @@ export default function CsvUploadButton({ onUpload }: Props) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/upload`, {
-      method: "POST",
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-
-    const data = await res.json();
-    console.log("Schema:", data.schema);
-    onUpload(data.schema);
+    try {
+      const dataset = await parseAndStoreCSV(file);
+      console.log("Schema:", dataset.schema);
+      onUpload(dataset.schema, dataset.id);
+    } catch (err: any) {
+      console.error("Failed to parse CSV:", err.message);
+      alert(`Failed to parse CSV: ${err.message}`);
+    } finally {
+      e.target.value = "";
+    }
   }
 
   return (

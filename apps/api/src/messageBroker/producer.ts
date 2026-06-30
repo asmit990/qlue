@@ -2,14 +2,13 @@ import { getChannel } from "./connection";
 
 
 
-export const publishQuery = (jobId:string, question: string, schema:string) => {
+export const publishQuery = (jobId: string, question: string, schema: string, datasetId: string) => {
      const channel = getChannel()
 
-     const payload = JSON.stringify({jobId, question, schema})
+     const payload = JSON.stringify({ jobId, question, schema, datasetId })
 
-     channel.sendToQueue('query_queue', Buffer.from(payload), {persistent: true})
+     channel.sendToQueue('query_queue', Buffer.from(payload), { persistent: true })
 
      console.log("Job established: ", jobId)
+
 }
-
-
