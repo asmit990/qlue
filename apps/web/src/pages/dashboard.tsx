@@ -11,7 +11,7 @@ export default function Dashboard() {
   const [sqlOpen, setSqlOpen] = useState(false);
 
   const schema = location.state?.schema;
-  const datasetId = location.state?.datasetId;
+  const datasetId = location.state?.localDatasetId;
   const question = location.state?.question || "Show insights";
 
   const { ask, status, rows, chartType, sql } = useWebSocket();

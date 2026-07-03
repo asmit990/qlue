@@ -15,7 +15,7 @@ interface JobResult {
   error?: string;
 }
 
-const WS_URL = "wss://your-api-domain.com/ws"; // adjust to your actual WS endpoint
+const WS_URL = "wss://your-api-domain.com/ws"; 
 
 export function useQueryJob() {
   const [job, setJob] = useState<JobResult>({ status: "idle" });

@@ -6,7 +6,7 @@ let SQL: any = null;
 async function getSqlJs() {
   if (SQL) return SQL;
   SQL = await initSqlJs({
-  locateFile: (file: any) => `https://sql.js.org/dist/${file}`,
+locateFile: (file: any) => `/${file}`,
   });
   return SQL;
 }
