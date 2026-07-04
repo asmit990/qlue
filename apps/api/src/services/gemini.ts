@@ -1,8 +1,9 @@
+import "dotenv/config";
+
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from "dotenv"
+
 import type { ChartType, QueryResponse } from "../types";
 
-dotenv.config()
 
 const apiKey = process.env.GEMINI_API_KEY
 

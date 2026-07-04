@@ -1,4 +1,5 @@
 import initSqlJs, { type Database as SqlJsDatabase } from "sql.js";
+import sqlWasmUrl from "sql.js/dist/sql-wasm.wasm?url";
 import { type CSVDataset } from "./db";
 
 let SQL: any = null;
@@ -6,7 +7,7 @@ let SQL: any = null;
 async function getSqlJs() {
   if (SQL) return SQL;
   SQL = await initSqlJs({
-locateFile: (file: any) => `/${file}`,
+    locateFile: () => sqlWasmUrl,
   });
   return SQL;
 }

@@ -1,9 +1,10 @@
 import amqp from 'amqplib';
 
+let connection: amqp.ChannelModel;
 let channel: amqp.Channel;
 
 export const connectRabbitMQ = async () => {
-    const connection = await amqp.connect(
+    connection = await amqp.connect(
         process.env.RABBITMQ_URL!
     );
 
@@ -17,3 +18,17 @@ export const connectRabbitMQ = async () => {
 };
 
 export const getChannel = () => channel;
+
+export const closeRabbitMQ = async () => {
+    try {
+        await channel?.close();
+    } catch {
+        // channel may already be closed
+    }
+    try {
+        await connection?.close();
+    } catch {
+        // connection may already be closed
+    }
+    console.log('RabbitMQ connection closed');
+};

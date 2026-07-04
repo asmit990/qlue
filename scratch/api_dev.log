@@ -1,0 +1,44 @@
+
+> api@1.0.0 dev /Users/asmithu/Documents/qlue/apps/api
+> tsx watch src/index.ts
+
+◇ injected env (0) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+(node:28405) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:28405) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+SMTP connection failed: Error: Invalid login: 525 5.7.1 Unauthorized IP address
+    at SMTPConnection._formatError (/Users/asmithu/Documents/qlue/node_modules/.pnpm/nodemailer@8.0.7/node_modules/nodemailer/lib/smtp-connection/index.js:887:19)
+    at SMTPConnection._actionAUTHComplete (/Users/asmithu/Documents/qlue/node_modules/.pnpm/nodemailer@8.0.7/node_modules/nodemailer/lib/smtp-connection/index.js:1695:34)
+    at SMTPConnection.<anonymous> (/Users/asmithu/Documents/qlue/node_modules/.pnpm/nodemailer@8.0.7/node_modules/nodemailer/lib/smtp-connection/index.js:626:26)
+    at SMTPConnection._processResponse (/Users/asmithu/Documents/qlue/node_modules/.pnpm/nodemailer@8.0.7/node_modules/nodemailer/lib/smtp-connection/index.js:1072:20)
+    at SMTPConnection._onData (/Users/asmithu/Documents/qlue/node_modules/.pnpm/nodemailer@8.0.7/node_modules/nodemailer/lib/smtp-connection/index.js:847:14)
+    at SMTPConnection._onSocketData (/Users/asmithu/Documents/qlue/node_modules/.pnpm/nodemailer@8.0.7/node_modules/nodemailer/lib/smtp-connection/index.js:217:44)
+    at TLSSocket.emit (node:events:509:20)
+    at addChunk (node:internal/streams/readable:564:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:515:3)
+    at Readable.push (node:internal/streams/readable:395:5) {
+  code: 'EAUTH',
+  response: '525 5.7.1 Unauthorized IP address',
+  responseCode: 525,
+  command: 'AUTH PLAIN'
+}
+Connected to RabbitMQ
+Worker started — listening for jobs (SQL generation only)
+Qlue server running on port 3000
+DB initialized
+Client connected: cde30c4f-5130-4da1-a9da-c6084a0b235a
+Client connected: b7d96642-3606-4e02-9e76-bc5676f00a21
+Client connected: bd8818db-9554-4c9d-9c0e-6c6b0e7130d9
+Received message on WS for jobId: bd8818db-9554-4c9d-9c0e-6c6b0e7130d9
+Token verified. User ID: 1
+Job established:  bd8818db-9554-4c9d-9c0e-6c6b0e7130d9
+Query published for jobId: bd8818db-9554-4c9d-9c0e-6c6b0e7130d9
+9:18:07 PM [tsx] Previous process hasn't exited yet. Force killing...
+ ELIFECYCLE  Command failed with exit code 143.

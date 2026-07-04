@@ -127,12 +127,12 @@ export function useWebSocket() {
         };
     }, []);
 
-    function ask(question: string, schema: string, datasetId: string) {
+    function ask(question: string, schema: string, datasetId: string, authToken: string) {
         datasetIdRef.current = datasetId; // remember it for ready_for_local_execution
 
         const send = () => {
             useChartStore.getState().setStatus("thinking");
-            ws.current!.send(JSON.stringify({ question, schema, datasetId }));
+            ws.current!.send(JSON.stringify({ question, schema, datasetId, token: authToken }));
         };
 
         if (ws.current?.readyState === WebSocket.OPEN) {

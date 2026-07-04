@@ -59,12 +59,13 @@ export default function Dashboard() {
     document.body.removeChild(link);
   };
 
-  useEffect(() => {
+useEffect(() => {
     if (!schema || !datasetId) {
       navigate("/ask");
       return;
     }
-    ask(question, schema, datasetId);
+    const token = localStorage.getItem("token") || "";
+    ask(question, schema, datasetId, token);
   }, []);
 
   return (
