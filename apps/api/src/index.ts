@@ -61,16 +61,7 @@ wss.on("connection", (ws: any) => {
     }
 
     console.log("Token verified. User ID:", userId);
-    const published = publishQuery(ws.jobId, question, schema, datasetId, userId);
-    if (!published) {
-      ws.send(
-        JSON.stringify({
-          status: "error",
-          error: "Service temporarily unavailable, please retry",
-        })
-      );
-      return;
-    }
+    publishQuery(ws.jobId, question, schema, datasetId, userId);
     console.log("Query published for jobId:", ws.jobId);
   });
 
