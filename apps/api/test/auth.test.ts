@@ -24,6 +24,8 @@ jest.mock("jsonwebtoken", () => ({
 jest.mock("nodemailer", () => ({
   createTransport: jest.fn().mockReturnValue({
     sendMail: (jest.fn() as jest.Mock).mockResolvedValue({ messageId: "test-id" }),
+    verify: jest.fn(),
+    on: jest.fn(),
   }),
 }));
 

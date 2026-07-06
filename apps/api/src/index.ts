@@ -40,7 +40,16 @@ wss.on("connection", (ws: any) => {
 
   ws.on("message", async (message: any) => {
     console.log("Received message on WS for jobId:", ws.jobId);
-    const { question, schema, datasetId, token } = JSON.parse(message.toString());
+    const { type, question, schema, datasetId, token } = JSON.parse(message.toString());
+
+    // Client sends bookkeeping messages (e.g. after finishing local SQL
+    // execution) that are not new queries and carry no auth token. Ignore
+    // them here instead of running them through jwt.verify, which would fail
+    // and spuriously reply "Unauthorized".
+    if (type && type !== "query") {
+      console.log("Ignoring non-query WS message of type:", type);
+      return;
+    }
 
     let userId: number;
     try {
