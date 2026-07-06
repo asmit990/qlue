@@ -1,7 +1,7 @@
 import { Router, Response, Request } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { authenticateToken } from "../auth/middleware";
-import { getChannel } from "../messageBroker/connection";
+import { getChannel, QUEUE_NAME } from "../messageBroker/connection";
 import { QueryHistoryEntry } from "../types";
 import pool from "../services/database";
 
@@ -33,8 +33,13 @@ r.post(
       const jobId = uuidv4();
 
       const channel = getChannel();
+      if (!channel) {
+        return res.status(503).json({
+          error: "Service temporarily unavailable, please retry",
+        });
+      }
       channel.sendToQueue(
-        "query_queue",
+        QUEUE_NAME,
         Buffer.from(
           JSON.stringify({ jobId, question, schema, userId })
         )

@@ -6,8 +6,8 @@ import cors from "cors";
 import { v4 as uuid } from 'uuid';
 import queryRouter from "./routes/query";
 import authRouter from "./auth/router";
-import { connectRabbitMQ, closeRabbitMQ } from "./messageBroker/connection";
-import { startWorker } from "./messageBroker/worker";
+import { startRabbitMQ, closeRabbitMQ } from "./messageBroker/connection";
+import { registerWorker } from "./messageBroker/worker";
 import { publishQuery } from "./messageBroker/producer";
 import jwt from "jsonwebtoken";
 
@@ -61,7 +61,16 @@ wss.on("connection", (ws: any) => {
     }
 
     console.log("Token verified. User ID:", userId);
-    publishQuery(ws.jobId, question, schema, datasetId, userId);
+    const published = publishQuery(ws.jobId, question, schema, datasetId, userId);
+    if (!published) {
+      ws.send(
+        JSON.stringify({
+          status: "error",
+          error: "Service temporarily unavailable, please retry",
+        })
+      );
+      return;
+    }
     console.log("Query published for jobId:", ws.jobId);
   });
 
@@ -69,11 +78,17 @@ wss.on("connection", (ws: any) => {
 });
 
 async function main() {
-  await connectRabbitMQ();
-  startWorker(wss);
-  server.listen(3000, () => {
-    console.log("Qlue server running on port 3000");
+  // Bind the port immediately so the platform (Render) detects an open port
+  // and the service stays healthy even while RabbitMQ is (re)connecting. The
+  // broker supervisor connects in the background and re-registers the worker
+  // on every (re)connect, so a transient AMQP failure never takes the HTTP
+  // server down.
+  const port = Number(process.env.PORT) || 3000;
+  server.listen(port, () => {
+    console.log(`Qlue server running on port ${port}`);
   });
+
+  startRabbitMQ((channel) => registerWorker(channel, wss));
 }
 
 // Release the RabbitMQ consumer on exit/reload so we don't leave orphaned
