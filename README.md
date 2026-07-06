@@ -13,27 +13,32 @@ In most companies, data is locked behind technical barriers. Non-technical stake
 
 
 
-
-[![Watch the Demo](./thumbnail.png)](https://youtu.be/MHOpeayvVtk)>
+[![Watch the Demo](./thumbnail.png)](https://youtu.be/MHOpeayvVtk)
 
 
 ## System Architecture
 
 ```
-React Frontend
+React Frontend  ──  CSV parsed & stored in-browser (IndexedDB)
       |
-      | Natural language query (WebSocket)
+      | Natural language query + schema only (WebSocket)
       v
-Express API  ------>  RabbitMQ Queue  ------>  Worker
+Express API  ──────>  RabbitMQ Queue  ──────>  Worker
                                                   |
-                                          Gemini API (NL -> SQL)
+                                        Gemini API (NL -> SQL only)
                                                   |
-                                              SQLite DB
+                                     "ready_for_local_execution"
+                                       { sql, chartType } over WebSocket
                                                   |
-                                          WebSocket response
+                                                  v
+                                  Browser runs SQL locally (sql.js WASM)
                                                   |
-                                         Recharts Dashboard
+                                       Recharts / Chart.js Dashboard
+
+PostgreSQL  ──  users + query history        (raw CSV data never leaves the browser)
 ```
+
+**Privacy by design:** the backend only ever sees the column schema, never the row data. Gemini generates the SQL, but the query runs entirely in the browser against the CSV you loaded — your data never touches the server.
 
 Full architecture diagram: see ![Description](qlue_system_workflow.svg)
 
@@ -43,40 +48,45 @@ Full architecture diagram: see ![Description](qlue_system_workflow.svg)
 
 | Layer | Technology |
 |---|---|
-| Frontend | React.js (Vite), Tailwind CSS, Recharts, Framer Motion |
-| Backend | Node.js, Express, TypeScript |
+| Frontend | React 19 (Vite), Tailwind CSS, Recharts, Chart.js, Framer Motion |
+| Backend | Node.js, Express 5, TypeScript |
 | AI Engine | Google Gemini 2.5 Flash |
-| Database | SQLite (dynamic CSV-backed tables) |
+| In-browser SQL | sql.js (SQLite compiled to WASM) |
+| CSV Handling | PapaParse (client-side), stored in IndexedDB |
+| Database | PostgreSQL (users + query history) |
 | Message Broker | RabbitMQ (concurrent query handling) |
 | Realtime | WebSocket (live status streaming) |
-| Auth | JWT, bcrypt |
-| Data Ingestion | multer, csv-parser |
-| Monorepo | Turborepo, pnpm |
+| Auth | JWT, bcrypt, Joi validation |
+| Email | Nodemailer (Gmail SMTP) |
+| Monorepo | Turborepo, pnpm workspaces |
 
 ---
 
 ## Key Features
 
 **Natural Language to SQL**
-Advanced prompt engineering with schema context passed to Gemini to generate optimized SQLite queries. The AI understands table relationships and column semantics without any manual configuration.
+Advanced prompt engineering with schema context passed to Gemini to generate optimized SQL queries. The AI understands column semantics without any manual configuration — and only ever receives the schema, never the underlying data.
+
+**Client-Side Query Execution**
+Generated SQL runs directly in the browser via sql.js (SQLite compiled to WebAssembly). Your CSV data is parsed with PapaParse, cached in IndexedDB, and queried locally — so raw data never leaves the client.
 
 **Auto-Visualization**
 Gemini selects the most appropriate chart type (Bar, Line, Area, Pie, Scatter, Radar) based on the data shape and query intent — no manual chart configuration required.
 
 **CSV Data Playground**
-Upload any CSV file and the system dynamically creates SQLite tables for instant querying. Zero setup, zero schema definition.
+Upload any CSV file and start querying instantly. Zero setup, zero schema definition.
 
 **Concurrent Query Queue**
 RabbitMQ queues all incoming user queries so multiple users are handled reliably without rate-limit crashes or request collisions.
 
 **Live Status Streaming**
-WebSocket streams real-time status updates (thinking, querying, done) back to the UI as each job progresses through the pipeline.
+WebSocket streams real-time status updates (`thinking`, `generated`, `ready_for_local_execution`, `error`) back to the UI as each job progresses through the pipeline.
 
-**Query History Sidebar**
-ChatGPT-style hover sidebar tracks all previous queries grouped by date. Click any entry to re-run it instantly.
+**Query History**
+Every query is persisted to PostgreSQL and grouped by date, so past questions can be revisited and re-run.
 
 **Authentication**
-Full JWT-based auth system with register, login, forgot password, and email-based password reset via nodemailer.
+Full JWT-based auth system with register, login, forgot password, and email-based password reset via Nodemailer, with Joi request validation.
 
 ---
 
@@ -85,12 +95,13 @@ Full JWT-based auth system with register, login, forgot password, and email-base
 ```
 qlue/
   apps/
-    api/
+    api/                                    Express + WebSocket backend
       src/
         routes/           query.ts          upload + query HTTP routes
         services/         gemini.ts         AI logic + prompt engineering
-                          database.ts       SQLite connection
-        rabbitmq/         connection.ts     RabbitMQ setup
+                          database.ts       Postgres schema init
+        connections/      dbconnection.ts   Postgres pool
+        messageBroker/    connection.ts     RabbitMQ setup
                           producer.ts       publish jobs to queue
                           worker.ts         consume + process jobs
                           queue.ts          queue name constants
@@ -98,26 +109,33 @@ qlue/
                           controller.ts     register, login, reset
                           service.ts        business logic
                           middleware.ts     JWT verification
+                          validation/       Joi request schemas
+                          utils/mailer.ts   Nodemailer (Gmail SMTP)
+                          oauth/            OAuth providers (WIP)
         index.ts                            Express + WebSocket server
 
-    web/
+    web/                                    React (Vite) frontend
       src/
-        components/       Chart.tsx         Recharts wrapper (6 chart types)
-                          QuerySidebar.tsx  hover history sidebar
-                          CsvUploadButton   file upload
+        components/       charts.tsx        chart rendering
+                          queryRunner.tsx   runs generated SQL locally
+                          upload.tsx        CSV upload
+                          sidebar.tsx       query history sidebar
                           ProtectedRoute    auth guard
-        hooks/            useWebSocket.ts   WebSocket + Zustand
+        lib/              sqlExecutor.ts    sql.js (WASM) query execution
+                          csvParser.ts      PapaParse CSV parsing
+                          db.ts             IndexedDB dataset storage
+        hooks/            useWebSocket.ts   WebSocket client
         store/            chartStore.ts     Zustand global state
-        pages/            Landing.tsx
-                          Ask.tsx
-                          Dashboard.tsx
-                          Register.tsx
-                          Login.tsx
-                          ForgetPassword.tsx
-                          ResetPassword.tsx
-                          AboutUs.tsx
+        pages/            landing / ask / dashboard / login /
+                          register / forgetpassword / resetPassword / aboutUs
 
-  .env                                      environment variables
+    docs/                                   Next.js documentation app
+
+  packages/
+    ui/                                     shared UI components
+    eslint-config/                          shared ESLint config
+    typescript-config/                      shared tsconfig presets
+
   turbo.json                                turborepo config
 ```
 
@@ -130,6 +148,7 @@ qlue/
 - Node.js v18+
 - pnpm
 - Docker (for RabbitMQ)
+- PostgreSQL database (local or hosted)
 - Google Gemini API key — free at aistudio.google.com
 
 ### Installation
@@ -147,11 +166,14 @@ Create `.env` in `apps/api`:
 ```env
 GEMINI_API_KEY=your_key_here
 JWT_SECRET=your_jwt_secret
+DATABASE_URL=postgres://user:password@localhost:5432/qlue
 RABBITMQ_URL=amqp://localhost
+FRONTEND_URL=http://localhost:5173
 EMAIL=your_gmail@gmail.com
 EMAIL_PASSWORD=your_app_password
-PORT=3000
 ```
+
+> `EMAIL_PASSWORD` must be a Google **App Password**, not your account password.
 
 ### Start RabbitMQ
 
@@ -165,29 +187,31 @@ docker run -d --name rabbitmq \
 ### Run
 
 ```bash
-# API
-cd apps/api && pnpm dev
+# From the repo root (Turborepo runs all apps)
+pnpm dev
 
-# Frontend
-cd apps/web && pnpm dev
+# ...or run individually
+cd apps/api && pnpm dev   # backend
+cd apps/web && pnpm dev   # frontend
 ```
+
+The Postgres tables (`users`, `query_history`) are created automatically on API startup.
 
 ---
 
 ## How It Works
 
-1. User uploads a CSV file — the system auto-creates a SQLite table from the file
-2. User types a natural language query — sent via WebSocket to the backend
-3. Query is published to RabbitMQ queue
-4. Worker picks up the job, calls Gemini with the DB schema as context
-5. Gemini returns SQL + recommended chart type
-6. SQL runs against SQLite, rows are returned
-7. WebSocket streams the result back to React
-8. Recharts renders the dashboard instantly
+1. User uploads a CSV — it's parsed in the browser with PapaParse and cached in IndexedDB
+2. User types a natural language query — sent (with only the column schema) via WebSocket to the backend
+3. The query is published to the RabbitMQ queue
+4. A worker picks up the job and calls Gemini with the schema as context
+5. Gemini returns SQL + a recommended chart type
+6. The backend streams `ready_for_local_execution` ({ sql, chartType }) back over WebSocket and records the query in PostgreSQL
+7. The browser runs the SQL locally against the loaded CSV via sql.js (WASM)
+8. Recharts / Chart.js renders the dashboard instantly — raw data never left the client
 
 ---
 
 ## Developed by
 
 Asmit Pandey — github.com/asmit990
-

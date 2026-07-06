@@ -12,6 +12,18 @@ async function getSqlJs() {
   return SQL;
 }
 
+// Every column is stored as TEXT, so sql.js hands numeric results back as
+// strings ("10", "20.5"). Recharts needs real numbers to compute pie angles,
+// axis scales, scatter/radar points, etc. — otherwise "10" + "20" concatenates
+// and the chart breaks. Bars happen to tolerate numeric strings, which is why
+// only the bar graph rendered before. Coerce clean numeric strings to numbers
+// while leaving labels (and non-numeric text) untouched.
+function coerceValue(val: any): any {
+  if (typeof val !== "string" || val.trim() === "") return val;
+  const num = Number(val);
+  return Number.isFinite(num) ? num : val;
+}
+
 export async function executeSQLOnDataset(
   dataset: CSVDataset,
   sql: string
@@ -42,7 +54,7 @@ export async function executeSQLOnDataset(
 
     const { columns: resultCols, values } = result[0];
     return values.map((row: any[]) =>
-      Object.fromEntries(row.map((val, i) => [resultCols[i], val]))
+      Object.fromEntries(row.map((val, i) => [resultCols[i], coerceValue(val)]))
     );
   } finally {
     db.close();
