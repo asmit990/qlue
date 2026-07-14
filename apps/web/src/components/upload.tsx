@@ -1,8 +1,9 @@
 import { Upload } from "lucide-react";
 import { parseAndStoreCSV } from "@/lib/csvParser";
+import type { Dataset } from "@/lib/db";
 
 interface Props {
-  onUpload: (schema: string, datasetId: string) => void;
+  onUpload: (dataset: Dataset) => void;
 }
 
 export default function CsvUploadButton({ onUpload }: Props) {
@@ -13,8 +14,7 @@ export default function CsvUploadButton({ onUpload }: Props) {
 
     try {
       const dataset = await parseAndStoreCSV(file);
-      console.log("Schema:", dataset.schema);
-      onUpload(dataset.schema, dataset.id);
+      onUpload(dataset);
     } catch (err: any) {
       console.error("Failed to parse CSV:", err.message);
       alert(`Failed to parse CSV: ${err.message}`);

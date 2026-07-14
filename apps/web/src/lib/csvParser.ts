@@ -1,31 +1,28 @@
 import Papa from "papaparse";
-import { v4 as uuidv4 } from "uuid";
-import { saveDataset, type CSVDataset } from "./db";
+import { saveDataset, type Dataset } from "./db";
+import { createDataset } from "./datasets";
+import { loadDatasetIntoSqlJs } from "./sqlExecutor";
 
-export async function parseAndStoreCSV(file: File): Promise<CSVDataset> {
+export async function parseAndStoreCSV(file: File): Promise<Dataset> {
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
+      dynamicTyping: true,
       skipEmptyLines: true,
       complete: async (results) => {
         try {
-          const rows = results.data as Record<string, any>[];
+          const rows = results.data as Record<string, unknown>[];
           if (rows.length === 0) {
             return reject(new Error("CSV is empty"));
           }
 
-          const columns = Object.keys(rows[0]);
-          const schema = `Tables:\n- data(${columns.join(", ")})\n`;
-
-          const dataset: CSVDataset = {
-            id: uuidv4(),
+          const dataset = createDataset({
             name: file.name,
-            columns,
+            sourceType: "csv",
             rows,
-            schema,
-            created_at: new Date().toISOString(),
-          };
+          });
 
+          await loadDatasetIntoSqlJs(dataset);
           await saveDataset(dataset);
           resolve(dataset);
         } catch (err) {

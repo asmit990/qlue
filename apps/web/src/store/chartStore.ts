@@ -1,6 +1,13 @@
 import { create } from "zustand"
 
-type Status = "thinking" | "querying" | "done" | "error" | ""
+type Status =
+  | "thinking"
+  | "querying"
+  | "generated"
+  | "ready_for_local_execution"
+  | "done"
+  | "error"
+  | ""
 
 export type ChartType = "bar" | "line" | "pie" | "area" | "scatter" | "radar";
 

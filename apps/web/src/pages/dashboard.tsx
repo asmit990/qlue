@@ -4,14 +4,16 @@ import Chart from "../components/charts";
 import { useWebSocket } from "@/hooks/useWebsocket";
 import type { ChartType } from "@/store/chartStore";
 import { motion } from "framer-motion";
+import { getDataset } from "@/lib/db";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sqlOpen, setSqlOpen] = useState(false);
+  const [datasetName, setDatasetName] = useState("");
+  const [datasetTableName, setDatasetTableName] = useState("");
 
-  const schema = location.state?.schema;
-  const datasetId = location.state?.localDatasetId;
+  const datasetId = location.state?.datasetId;
   const question = location.state?.question || "Show insights";
 
   const { ask, status, rows, chartType, sql } = useWebSocket();
@@ -60,12 +62,35 @@ export default function Dashboard() {
   };
 
 useEffect(() => {
-    if (!schema || !datasetId) {
+    if (!datasetId) {
       navigate("/ask");
       return;
     }
-    const token = localStorage.getItem("token") || "";
-    ask(question, schema, datasetId, token);
+
+    let isMounted = true;
+
+    void (async () => {
+      const dataset = await getDataset(datasetId);
+
+      if (!dataset) {
+        navigate("/ask");
+        return;
+      }
+
+      if (!isMounted) {
+        return;
+      }
+
+      setDatasetName(dataset.name);
+      setDatasetTableName(dataset.id);
+
+      const token = localStorage.getItem("token") || "";
+      ask(question, dataset.schema, dataset.id, token);
+    })();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -111,6 +136,14 @@ useEffect(() => {
                 <span className={`text-xs font-bold uppercase ${status === "done" ? "text-green-500" : "text-black animate-pulse"}`}>
                   {status === "done" ? "Success" : status || "Initializing"}
                 </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1">Dataset</span>
+                <span className="text-xs font-bold uppercase">{datasetName || "Loading"}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1">SQL Table</span>
+                <span className="break-all text-[10px] font-bold">{datasetTableName || "Pending"}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1">Matrix Type</span>

@@ -24,6 +24,21 @@ async function initDB() {
     );
   `);
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS user_connections (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      provider TEXT NOT NULL CHECK (provider IN ('google', 'microsoft')),
+      access_token_enc TEXT NOT NULL,
+      refresh_token_enc TEXT,
+      expires_at TIMESTAMP NOT NULL,
+      scope TEXT,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW(),
+      UNIQUE (user_id, provider)
+    );
+  `);
+
   console.log("DB initialized");
 }
 

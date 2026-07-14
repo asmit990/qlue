@@ -1,8 +1,6 @@
 import amqp from 'amqplib';
 
-// Queue name is env-overridable so local dev and prod don't fight over the
-// same (exclusive) consumer on a shared CloudAMQP instance. Set QUEUE_NAME in
-// your local .env (e.g. "query_queue_dev") to keep environments isolated.
+
 export const QUEUE_NAME = process.env.QUEUE_NAME || 'query_queue';
 
 let connection: amqp.ChannelModel | null = null;

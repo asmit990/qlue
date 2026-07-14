@@ -2,10 +2,10 @@ import { useState } from "react";
 import { parseAndStoreCSV } from "../lib/csvParser";
 import { executeSQLOnDataset } from "../lib/sqlExecutor";
 import { useQueryJob } from "../hooks/useQueryJob";
-import { type CSVDataset } from "../lib/db";
+import { type Dataset } from "../lib/db";
 
 export default function QueryRunner({ authToken }: { authToken: string }) {
-  const [dataset, setDataset] = useState<CSVDataset | null>(null);
+  const [dataset, setDataset] = useState<Dataset | null>(null);
   const [question, setQuestion] = useState("");
   const [rows, setRows] = useState<Record<string, any>[]>([]);
   const [chartType, setChartType] = useState<string>("");
