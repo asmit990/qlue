@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { FileSpreadsheet, Files, LoaderCircle } from "lucide-react";
 import CsvUploadButton from "@/components/upload";
 import type { Dataset } from "@/lib/db";
@@ -6,6 +6,7 @@ import { openGoogleSheetsPicker } from "@/lib/connectors/googleSheets";
 import { openOneDrivePicker } from "@/lib/oneDrive";
 
 type RemoteProvider = "google" | "microsoft";
+const CONNECTOR_RETURN_KEY = "qlue.pendingConnector";
 
 interface SourcePickerProps {
   authToken: string;
@@ -27,6 +28,10 @@ export default function SourcePicker({
 }: SourcePickerProps) {
   const [loadingProvider, setLoadingProvider] = useState<RemoteProvider | "csv" | "">("");
 
+  const resumePendingImport = useEffectEvent((provider: RemoteProvider) => {
+    void handleRemoteImport(provider, { skipOAuthRedirect: true });
+  });
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const connector = params.get("connector");
@@ -34,21 +39,36 @@ export default function SourcePicker({
     const error = params.get("error");
 
     if (!connector || !connected) return;
-
-    if (connected === "1") {
-      alert(`${connector === "google" ? "Google Sheets" : "Excel Online"} connected. Click again to import.`);
-    } else if (error) {
-      alert(`Failed to connect ${connector}: ${error}`);
-    }
+    if (connector !== "google" && connector !== "microsoft") return;
 
     params.delete("connector");
     params.delete("connected");
     params.delete("error");
     const nextUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}${window.location.hash}`;
     window.history.replaceState({}, "", nextUrl);
-  }, []);
 
-  async function handleRemoteImport(provider: RemoteProvider) {
+    if (connected !== "1") {
+      clearPendingConnector();
+      if (error) {
+        alert(`Failed to connect ${connector}: ${error}`);
+      }
+      return;
+    }
+
+    const pendingConnector = readPendingConnector();
+    if (pendingConnector !== connector) {
+      alert(`${connector === "google" ? "Google Sheets" : "Excel Online"} connected.`);
+      return;
+    }
+
+    clearPendingConnector();
+    resumePendingImport(connector);
+  }, [authToken]);
+
+  async function handleRemoteImport(
+    provider: RemoteProvider,
+    options?: { skipOAuthRedirect?: boolean }
+  ) {
     if (!authToken) {
       alert("Your session is missing. Please log in again.");
       return;
@@ -64,22 +84,32 @@ export default function SourcePicker({
           : await openOneDrivePicker(accessToken);
 
       await startRemoteImport(provider, selectedFile.fileId, selectedFile.name, authToken);
-    } catch (err: any) {
-      if (err?.message === "not_connected") {
+    } catch (err: unknown) {
+      const errorMessage = getErrorMessage(err);
+
+      if (errorMessage === "not_connected" && !options?.skipOAuthRedirect) {
         try {
+          storePendingConnector(provider);
           const authUrl = await getConnectorAuthUrl(provider, authToken);
           window.location.assign(authUrl);
           return;
-        } catch (connectErr: any) {
+        } catch (connectErr: unknown) {
+          clearPendingConnector();
           console.error(`Failed to connect ${provider}:`, connectErr);
-          alert(connectErr?.message || `Failed to connect ${provider}`);
+          alert(getErrorMessage(connectErr) || `Failed to connect ${provider}`);
           return;
         }
       }
 
-      if (err?.message && !`${err.message}`.toLowerCase().includes("cancel")) {
+      if (errorMessage === "not_connected") {
+        clearPendingConnector();
+        alert(`${provider === "google" ? "Google Sheets" : "Excel Online"} is still not connected. Please try again.`);
+        return;
+      }
+
+      if (errorMessage && !errorMessage.toLowerCase().includes("cancel")) {
         console.error(`Failed to import from ${provider}:`, err);
-        alert(err.message || `Failed to import from ${provider}`);
+        alert(errorMessage || `Failed to import from ${provider}`);
       }
     } finally {
       setLoadingProvider("");
@@ -137,8 +167,9 @@ async function getPickerToken(provider: RemoteProvider, authToken: string): Prom
 }
 
 async function getConnectorAuthUrl(provider: RemoteProvider, authToken: string): Promise<string> {
+  const returnTo = `${window.location.pathname}${window.location.search}${window.location.hash}` || "/ask";
   const response = await fetch(
-    `${API_URL}/api/connectors/auth-url?provider=${provider}&returnTo=${encodeURIComponent("/ask")}`,
+    `${API_URL}/api/connectors/auth-url?provider=${provider}&returnTo=${encodeURIComponent(returnTo)}`,
     {
       headers: {
         Authorization: `Bearer ${authToken}`,
@@ -157,4 +188,21 @@ async function getConnectorAuthUrl(provider: RemoteProvider, authToken: string):
   }
 
   return payload.url;
+}
+
+function storePendingConnector(provider: RemoteProvider) {
+  window.sessionStorage.setItem(CONNECTOR_RETURN_KEY, provider);
+}
+
+function readPendingConnector(): RemoteProvider | null {
+  const provider = window.sessionStorage.getItem(CONNECTOR_RETURN_KEY);
+  return provider === "google" || provider === "microsoft" ? provider : null;
+}
+
+function clearPendingConnector() {
+  window.sessionStorage.removeItem(CONNECTOR_RETURN_KEY);
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "";
 }
