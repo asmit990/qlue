@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileSpreadsheet, Files, LoaderCircle } from "lucide-react";
 import CsvUploadButton from "@/components/upload";
 import type { Dataset } from "@/lib/db";
@@ -27,6 +27,27 @@ export default function SourcePicker({
 }: SourcePickerProps) {
   const [loadingProvider, setLoadingProvider] = useState<RemoteProvider | "csv" | "">("");
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const connector = params.get("connector");
+    const connected = params.get("connected");
+    const error = params.get("error");
+
+    if (!connector || !connected) return;
+
+    if (connected === "1") {
+      alert(`${connector === "google" ? "Google Sheets" : "Excel Online"} connected. Click again to import.`);
+    } else if (error) {
+      alert(`Failed to connect ${connector}: ${error}`);
+    }
+
+    params.delete("connector");
+    params.delete("connected");
+    params.delete("error");
+    const nextUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}${window.location.hash}`;
+    window.history.replaceState({}, "", nextUrl);
+  }, []);
+
   async function handleRemoteImport(provider: RemoteProvider) {
     if (!authToken) {
       alert("Your session is missing. Please log in again.");
@@ -44,6 +65,18 @@ export default function SourcePicker({
 
       await startRemoteImport(provider, selectedFile.fileId, selectedFile.name, authToken);
     } catch (err: any) {
+      if (err?.message === "not_connected") {
+        try {
+          const authUrl = await getConnectorAuthUrl(provider, authToken);
+          window.location.assign(authUrl);
+          return;
+        } catch (connectErr: any) {
+          console.error(`Failed to connect ${provider}:`, connectErr);
+          alert(connectErr?.message || `Failed to connect ${provider}`);
+          return;
+        }
+      }
+
       if (err?.message && !`${err.message}`.toLowerCase().includes("cancel")) {
         console.error(`Failed to import from ${provider}:`, err);
         alert(err.message || `Failed to import from ${provider}`);
@@ -101,4 +134,27 @@ async function getPickerToken(provider: RemoteProvider, authToken: string): Prom
   }
 
   return payload.accessToken;
+}
+
+async function getConnectorAuthUrl(provider: RemoteProvider, authToken: string): Promise<string> {
+  const response = await fetch(
+    `${API_URL}/api/connectors/auth-url?provider=${provider}&returnTo=${encodeURIComponent("/ask")}`,
+    {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => null);
+    throw new Error(error?.error || `Failed to start ${provider} connection`);
+  }
+
+  const payload = await response.json();
+  if (!payload.url) {
+    throw new Error(`No ${provider} auth URL returned by the server`);
+  }
+
+  return payload.url;
 }

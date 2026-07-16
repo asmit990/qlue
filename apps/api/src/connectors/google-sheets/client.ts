@@ -1,6 +1,32 @@
 import { Pool } from 'pg';
-import { QueryError, ConnectionError } from '../base/errors';
-import { Row, QueryResult } from '../base/types';
+
+type Row = Record<string, unknown>;
+type QueryResult = {
+  rows: Row[];
+  rowCount: number;
+};
+
+class QueryError extends Error {
+  constructor(
+    public readonly provider: string,
+    message: string,
+    public readonly cause?: unknown
+  ) {
+    super(message);
+    this.name = 'QueryError';
+  }
+}
+
+class ConnectionError extends Error {
+  constructor(
+    public readonly provider: string,
+    message: string,
+    public readonly cause?: unknown
+  ) {
+    super(message);
+    this.name = 'ConnectionError';
+  }
+}
 
 export interface PostgresConfig {
   host: string;

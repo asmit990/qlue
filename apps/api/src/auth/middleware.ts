@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "qlue-super-secret";
 
 export interface AuthRequest extends Request {
-  user?: any;
+  user: any;
 }
 
 export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction): void => {
