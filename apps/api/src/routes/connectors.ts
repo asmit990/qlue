@@ -16,6 +16,7 @@ type ConnectorState = {
   provider: ConnectorProvider;
   returnTo?: string;
   purpose?: string;
+  frontendOrigin?: string;
 };
 
 function getProvider(provider: ConnectorProvider) {
@@ -29,6 +30,23 @@ function getFrontendRedirectTarget(pathname = '/ask') {
   return new URL(pathname, base);
 }
 
+function getFrontendOriginFromRequest(req: Request) {
+  const originHeader = req.headers.origin;
+  if (typeof originHeader !== 'string' || originHeader.length === 0) {
+    return undefined;
+  }
+
+  try {
+    const origin = new URL(originHeader);
+    if (origin.protocol !== 'http:' && origin.protocol !== 'https:') {
+      return undefined;
+    }
+    return origin.origin;
+  } catch {
+    return undefined;
+  }
+}
+
 function appendRedirectParams(url: URL, params: Record<string, string>) {
   Object.entries(params).forEach(([key, value]) => {
     url.searchParams.set(key, value);
@@ -39,6 +57,7 @@ function appendRedirectParams(url: URL, params: Record<string, string>) {
 router.get('/auth-url', authenticateToken, async (req, res) => {
   const provider = req.query.provider as ConnectorProvider;
   const returnTo = typeof req.query.returnTo === 'string' ? req.query.returnTo : '/ask';
+  const frontendOrigin = getFrontendOriginFromRequest(req);
   if (provider !== 'google' && provider !== 'microsoft') {
     return res.status(400).json({ error: 'invalid_provider' });
   }
@@ -49,6 +68,7 @@ router.get('/auth-url', authenticateToken, async (req, res) => {
       provider,
       returnTo,
       purpose: 'connector-auth',
+      frontendOrigin,
     },
     JWT_SECRET,
     { expiresIn: '10m' }
@@ -87,7 +107,9 @@ export async function handleConnectorCallback(req: Request, res: Response) {
     return res.status(400).send('Invalid OAuth state');
   }
 
-  const redirectUrl = getFrontendRedirectTarget(decoded.returnTo || '/ask');
+  const redirectUrl = decoded.frontendOrigin
+    ? new URL(decoded.returnTo || '/ask', decoded.frontendOrigin)
+    : getFrontendRedirectTarget(decoded.returnTo || '/ask');
 
   if (decoded.purpose !== 'connector-auth') {
     return res.redirect(
