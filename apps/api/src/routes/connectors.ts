@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
 import jwt from 'jsonwebtoken';
 import { authenticateToken } from '../auth/middleware';
 import { getValidAccessToken } from '../services/tokenVault';
@@ -71,7 +71,7 @@ router.get('/picker-token', authenticateToken, async (req, res) => {
   }
 });
 
-router.get('/callback', async (req, res) => {
+export async function handleConnectorCallback(req: Request, res: Response) {
   const code = typeof req.query.code === 'string' ? req.query.code : '';
   const state = typeof req.query.state === 'string' ? req.query.state : '';
   const oauthError = typeof req.query.error === 'string' ? req.query.error : '';
@@ -140,7 +140,9 @@ router.get('/callback', async (req, res) => {
       })
     );
   }
-});
+}
+
+router.get('/callback', handleConnectorCallback);
 
 router.post('/import', authenticateToken, async (req, res) => {
   const { provider, fileId, name, jobId } = req.body;

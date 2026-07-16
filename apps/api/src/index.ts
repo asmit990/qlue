@@ -5,7 +5,7 @@ import { WebSocketServer } from "ws";
 import cors from "cors";
 import { v4 as uuid } from 'uuid';
 import queryRouter from "./routes/query";
-import connectorsRouter from "./routes/connectors";
+import connectorsRouter, { handleConnectorCallback } from "./routes/connectors";
 import authRouter from "./auth/router";
 import { startRabbitMQ, closeRabbitMQ } from "./messageBroker/connection";
 import { registerWorker } from "./messageBroker/worker";
@@ -29,6 +29,8 @@ app.use("/api/auth", authRouter);
 
 app.use("/api", queryRouter);
 app.use("/api/connectors", connectorsRouter);
+app.get("/auth/google/callback", handleConnectorCallback);
+app.get("/auth/microsoft/callback", handleConnectorCallback);
 
 app.get("/myip", async (req, res) => {
   const response = await fetch("https://api.ipify.org?format=json");
