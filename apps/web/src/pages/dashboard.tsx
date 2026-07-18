@@ -5,7 +5,7 @@ import { useWebSocket } from "@/hooks/useWebsocket";
 import type { ChartType } from "@/store/chartStore";
 import { motion } from "framer-motion";
 import { getDataset } from "@/lib/db";
-
+import ShareChartButton from "@/components/ui/sharingButton";
 export default function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -201,12 +201,19 @@ useEffect(() => {
                   </p>
                 </div>
                 {/* Wired button up to data sequence */}
-                <button 
-                  onClick={handleExport}
-                  className="text-[9px] font-black uppercase tracking-widest bg-black text-white px-4 py-2 hover:invert transition-all active:scale-95"
-                >
-                  Extract Data
-                </button>
+                <div className="flex items-center gap-3">
+                  <ShareChartButton
+                    question={question}
+                    chartType={chartType}
+                    chartData={rows}
+                  />
+                  <button 
+                    onClick={handleExport}
+                    className="text-[9px] font-black uppercase tracking-widest bg-black text-white px-4 py-2 hover:invert transition-all active:scale-95"
+                  >
+                    Extract Data
+                  </button>
+                </div>
               </div>
 
               {/* Box Body: Split Chart & Logic Arrow Guide */}

@@ -9,13 +9,14 @@ import Login from "./pages/login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgetPasswordPage from "./pages/forgetpassword";
 import ResetPassword from "./components/resetPassword";
-
+import ViewSnapshot from "./pages/viewSnapshot";
 
 
 export default function App() {
   return (
     <div className="relative min-h-screen w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] overflow-auto">
       <Routes>
+        <Route path="/view" element={<ViewSnapshot />} />
         <Route path="/" element={<Landing />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/about" element={<AboutUs />} />
