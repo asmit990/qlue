@@ -1,18 +1,18 @@
 import { useEffect, useEffectEvent, useState } from "react";
-import { FileSpreadsheet, Files, LoaderCircle } from "lucide-react";
+import { Files, LoaderCircle } from "lucide-react";
 import CsvUploadButton from "@/components/upload";
+import GoogleSheetsPicker from "@/components/connectors/GoogleSheetsPicker";
 import type { Dataset } from "@/lib/db";
-import { openGoogleSheetsPicker } from "@/lib/connectors/googleSheets";
 import { openOneDrivePicker } from "@/lib/oneDrive";
 
-type RemoteProvider = "google" | "microsoft";
+type RemoteProvider = "microsoft";
 const CONNECTOR_RETURN_KEY = "qlue.pendingConnector";
 
 interface SourcePickerProps {
   authToken: string;
   onDatasetReady: (dataset: Dataset) => void;
   startRemoteImport: (
-    provider: RemoteProvider,
+    provider: "google" | RemoteProvider,
     fileId: string,
     name: string,
     authToken: string
@@ -27,6 +27,7 @@ export default function SourcePicker({
   startRemoteImport,
 }: SourcePickerProps) {
   const [loadingProvider, setLoadingProvider] = useState<RemoteProvider | "csv" | "">("");
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const resumePendingImport = useEffectEvent((provider: RemoteProvider) => {
     void handleRemoteImport(provider, { skipOAuthRedirect: true });
@@ -39,7 +40,7 @@ export default function SourcePicker({
     const error = params.get("error");
 
     if (!connector || !connected) return;
-    if (connector !== "google" && connector !== "microsoft") return;
+    if (connector !== "microsoft") return;
 
     params.delete("connector");
     params.delete("connected");
@@ -57,7 +58,7 @@ export default function SourcePicker({
 
     const pendingConnector = readPendingConnector();
     if (pendingConnector !== connector) {
-      alert(`${connector === "google" ? "Google Sheets" : "Excel Online"} connected.`);
+      alert("Excel Online connected.");
       return;
     }
 
@@ -78,10 +79,7 @@ export default function SourcePicker({
 
     try {
       const accessToken = await getPickerToken(provider, authToken);
-      const selectedFile =
-        provider === "google"
-          ? await openGoogleSheetsPicker(accessToken)
-          : await openOneDrivePicker(accessToken);
+      const selectedFile = await openOneDrivePicker(accessToken);
 
       await startRemoteImport(provider, selectedFile.fileId, selectedFile.name, authToken);
     } catch (err: unknown) {
@@ -103,7 +101,7 @@ export default function SourcePicker({
 
       if (errorMessage === "not_connected") {
         clearPendingConnector();
-        alert(`${provider === "google" ? "Google Sheets" : "Excel Online"} is still not connected. Please try again.`);
+        alert("Excel Online is still not connected. Please try again.");
         return;
       }
 
@@ -120,20 +118,19 @@ export default function SourcePicker({
     <div className="flex flex-wrap items-center gap-3">
       <CsvUploadButton onUpload={onDatasetReady} />
 
-      <button
-        type="button"
-        onClick={() => void handleRemoteImport("google")}
+      <GoogleSheetsPicker
+        authToken={authToken}
         disabled={loadingProvider !== ""}
-        className="inline-flex items-center gap-3 rounded-full border border-black px-5 py-3 text-sm font-medium transition hover:bg-black hover:text-white disabled:cursor-wait disabled:opacity-60"
-      >
-        {loadingProvider === "google" ? <LoaderCircle className="animate-spin" size={18} /> : <FileSpreadsheet size={18} />}
-        Google Sheets
-      </button>
+        onLoadingChange={setIsGoogleLoading}
+        startRemoteImport={(fileId, name, token) =>
+          startRemoteImport("google", fileId, name, token)
+        }
+      />
 
       <button
         type="button"
         onClick={() => void handleRemoteImport("microsoft")}
-        disabled={loadingProvider !== ""}
+        disabled={loadingProvider !== "" || isGoogleLoading}
         className="inline-flex items-center gap-3 rounded-full border border-black px-5 py-3 text-sm font-medium transition hover:bg-black hover:text-white disabled:cursor-wait disabled:opacity-60"
       >
         {loadingProvider === "microsoft" ? <LoaderCircle className="animate-spin" size={18} /> : <Files size={18} />}
@@ -196,7 +193,7 @@ function storePendingConnector(provider: RemoteProvider) {
 
 function readPendingConnector(): RemoteProvider | null {
   const provider = window.sessionStorage.getItem(CONNECTOR_RETURN_KEY);
-  return provider === "google" || provider === "microsoft" ? provider : null;
+  return provider === "microsoft" ? provider : null;
 }
 
 function clearPendingConnector() {
