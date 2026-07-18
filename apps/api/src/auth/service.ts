@@ -4,9 +4,20 @@ import jwt from "jsonwebtoken";
 import transporter from "./utils/mailer";
 import pool from "../services/database";
 
+const JWT_SECRET = process.env.JWT_SECRET as string ;
+const DEFAULT_FRONTEND_URL = "https://qlue1.netlify.app";
 
-const JWT_SECRET =
-  process.env.JWT_SECRET 
+const getResetPasswordUrl = (token: string) => {
+  const configuredUrl = process.env.FRONTEND_URL?.trim();
+  const frontendUrl = configuredUrl || DEFAULT_FRONTEND_URL;
+  const urlWithProtocol = /^https?:\/\//i.test(frontendUrl)
+    ? frontendUrl
+    : `https://${frontendUrl}`;
+
+  return `${urlWithProtocol.replace(/\/+$/, "")}/reset-password/${encodeURIComponent(token)}`;
+};
+
+
 export const registerUser = async (
   name: string,
   email: string,
@@ -120,15 +131,16 @@ export const forgetPassword = async (
     UPDATE users
     SET reset_token = $1,
         reset_token_expiry = $2
-    WHERE username = $3
+    WHERE username = $3 AND email = $4
     RETURNING *
   `,
-    [token, expiry, username]
+    [token, expiry, username, email]
   );
 
   if (result.rows.length === 0) {
     throw new Error("User not found");
   }
+  const resetPasswordUrl = getResetPasswordUrl(token);
  // eamil 
 try {
 
@@ -172,7 +184,7 @@ try {
           <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 40px;">
             <tr>
               <td align="center" bgcolor="#1a1a1a" style="border: 1px solid #1a1a1a;">
-                <a href="${process.env.FRONTEND_URL}/reset-password/${token}" style="display: block; padding: 20px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; color: #ffffff; text-decoration: none;">
+                <a href="${resetPasswordUrl}" style="display: block; padding: 20px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; color: #ffffff; text-decoration: none;">
                   Execute Reset Sequence &rarr;
                 </a>
               </td>
