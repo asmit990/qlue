@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 import queryRouter from "./routes/query";
 import authRouter from "./auth/router";
 import { startRabbitMQ, closeRabbitMQ } from "./messageBroker/connection";
-import { registerWorker } from "./messageBroker/worker";
+import { processQueryJob, registerWorker } from "./messageBroker/worker";
 import { publishQuery } from "./messageBroker/producer";
 import jwt from "jsonwebtoken";
 
@@ -64,12 +64,10 @@ wss.on("connection", (ws: any) => {
     console.log("Token verified. User ID:", userId);
     const published = publishQuery(ws.jobId, question, schema, datasetId, userId);
     if (!published) {
-      ws.send(
-        JSON.stringify({
-          status: "error",
-          error: "Service temporarily unavailable, please retry",
-        })
-      );
+      // RabbitMQ is useful for buffering work, but a broker outage must not
+      // turn a healthy WebSocket connection into a failed query.
+      console.warn("RabbitMQ unavailable; processing query directly:", ws.jobId);
+      void processQueryJob({ jobId: ws.jobId, question, schema, datasetId, userId }, wss);
       return;
     }
     console.log("Query published for jobId:", ws.jobId);
