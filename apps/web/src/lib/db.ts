@@ -1,7 +1,7 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
 import { createDataset } from "./datasets";
 
-type DatasetSourceType = "csv" | "google-sheets" | "excel-online";
+type DatasetSourceType = "csv";
 
 interface DatasetColumn {
   name: string;

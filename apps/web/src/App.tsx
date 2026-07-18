@@ -9,7 +9,6 @@ import Login from "./pages/login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgetPasswordPage from "./pages/forgetpassword";
 import ResetPassword from "./components/resetPassword";
-import OAuthCallback from "./pages/oauthCallback";
 
 
 
@@ -24,11 +23,6 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/forgetpassword" element={<ForgetPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        {/* These match the OAuth redirect URIs registered with the providers. */}
-        <Route path="/connectors/google/callback" element={<OAuthCallback provider="google" />} />
-        <Route path="/connectors/microsoft/callback" element={<OAuthCallback provider="microsoft" />} />
-        <Route path="/auth/google/callback" element={<OAuthCallback provider="google" />} />
-        <Route path="/auth/microsoft/callback" element={<OAuthCallback provider="microsoft" />} />
         <Route path="/ask" element={
           <ProtectedRoute>
             <Ask />

@@ -26,7 +26,6 @@ const SPECS = [
 const LINKS = [
   { label: "Source Code // GitHub", url: "https://github.com/asmit990/qlue" },
   { label: "Developer Profile", url: "https://github.com/asmit990" },
-  { label: "Production Build", url: "https://qlue1.netlify.app/" },
 ];
 
 // --- COMPONENT ---
