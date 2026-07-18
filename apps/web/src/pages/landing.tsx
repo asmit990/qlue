@@ -1,8 +1,6 @@
-
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import  CardTilt from "@/components/cardTilt";
-
+import CardTilt from "@/components/cardTilt";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -14,10 +12,19 @@ export default function Landing() {
     "Compare Q1 vs Q2",
   ];
 
+  // Updated steps to reflect the actual CSV/WASM architecture
   const steps = [
-    { n: "01", title: "Type your question", desc: "Ask anything in plain English — no SQL, no setup." },
-    { n: "02", title: "AI writes the query", desc: "Gemini reads your schema and fetches the exact data." },
-    { n: "03", title: "Dashboard appears", desc: "Charts render instantly with the right visualizations." },
+    { n: "01", title: "Upload & Parse", desc: "Drop your CSV. PapaParse processes it and caches it locally in IndexedDB." },
+    { n: "02", title: "AI Writes SQL", desc: "Ask a question. Gemini reads ONLY your schema and streams back optimized SQL." },
+    { n: "03", title: "Local Execution", desc: "sql.js runs the query in-browser. Raw data never touches our servers." },
+  ];
+
+  // New features array based on your README
+  const features = [
+    { title: "Privacy By Design", desc: "Your row data never leaves the client. The API only sees column names." },
+    { title: "Auto-Visualization", desc: "Gemini automatically selects the best chart type based on data shape." },
+    { title: "Concurrent Queuing", desc: "RabbitMQ ensures multiple users are handled reliably without rate limits." },
+    { title: "Live Streaming", desc: "WebSockets stream real-time execution status directly to your dashboard." }
   ];
 
   return (
@@ -39,26 +46,26 @@ export default function Landing() {
       <div className="absolute bottom-0 right-[-20%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(255,0,182,.15),rgba(255,255,255,0))] pointer-events-none -z-10" />
 
       {/* Nav */}
- <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center px-10">
-  <div className="text-xl font-extrabold tracking-tighter ">
-    Qlue
-  </div>
+      <nav className="relative z-20 h-20 border-b border-gray-200 bg-white/50 backdrop-blur-md flex items-center px-10">
+        <div className="text-xl font-extrabold tracking-tighter">
+          Qlue
+        </div>
 
-  <div className="absolute right-9 flex items-center gap-8 text-[11px] font-black  tracking-[0.2em] text-gray-400">
-    <button
-      onClick={() => navigate("/about")}
-      className="hover:text-black transition-colors"
-    >
-      about
-    </button>
+        <div className="absolute right-9 flex items-center gap-8 text-[11px] font-black tracking-[0.2em] text-gray-400">
+          <button
+            onClick={() => navigate("/about")}
+            className="hover:text-black transition-colors"
+          >
+            about
+          </button>
 
-    <button
-      onClick={() => navigate("/ask")}
-      className="px-3 py-3 border border-black text-black hover:bg-black hover:text-white  transition-all" >
-      Initialize
-    </button>
-  </div>
-</nav>
+          <button
+            onClick={() => navigate("/ask")}
+            className="px-3 py-3 border border-black text-black hover:bg-black hover:text-white transition-all" >
+            Initialize
+          </button>
+        </div>
+      </nav>
 
       <main className="relative z-10 flex-1 flex flex-col">
 
@@ -75,13 +82,19 @@ export default function Landing() {
               <span className="text-[11px] font-black uppercase tracking-[0.4em] text-gray-400 mb-8 block">
                 System Interface // BI-01
               </span>
-              <h1 className="text-[12vw] lg:text-[8vw] font-black leading-[0.85] tracking-[-0.04em] uppercase italic">
+              <h1 className="text-[12vw] lg:text-[8vw] font-black leading-[0.85] tracking-[-0.04em] uppercase italic mb-6">
                 Welcome <br />
                 To{" "}
                 <span className="not-italic text-transparent" style={{ WebkitTextStroke: "2px black" }}>
                   Qlue.
                 </span>
               </h1>
+              
+              <div className="inline-block border border-black px-4 py-2 bg-green-50/50 backdrop-blur-sm mt-4">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-green-700">
+                  Privacy First: 100% Client-Side Execution
+                </span>
+              </div>
             </motion.div>
           </div>
 
@@ -92,7 +105,7 @@ export default function Landing() {
                 "Ask anything about your data in plain English."
               </p>
               <p className="text-sm text-gray-500 font-medium leading-relaxed uppercase tracking-wider mb-10">
-                Get an interactive dashboard — instantly. <br /> No SQL. No Setup. Just Answers.
+                Get an interactive dashboard — instantly. <br /> No SQL. No complex BI tools. Just Answers.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -107,7 +120,7 @@ export default function Landing() {
                   onClick={() => navigate("/about")}
                   className="flex-1 border border-black px-8 py-5 text-xs font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors"
                 >
-                  Learn More
+                  Architecture
                 </button>
               </div>
             </div>
@@ -157,6 +170,38 @@ export default function Landing() {
               </div>
             </CardTilt>
           ))}
+        </section>
+
+        {/* Technical Features Grid */}
+        <section className="bg-gray-50/80 flex flex-col lg:flex-row border-b border-black">
+          <div className="lg:w-1/3 p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-black flex flex-col justify-center">
+            <h2 className="text-3xl font-black uppercase tracking-tighter text-black italic">
+              Engineered <br /> For Speed & <br /> Privacy.
+            </h2>
+            <p className="text-xs font-medium text-gray-500 leading-relaxed uppercase tracking-widest mt-6">
+              Powered by React, Express, Gemini 2.5 Flash, RabbitMQ, and WebAssembly.
+            </p>
+          </div>
+          
+          <div className="lg:w-2/3 grid grid-cols-1 sm:grid-cols-2">
+            {features.map((feature, index) => (
+              <div 
+                key={feature.title} 
+                className={`p-10 lg:p-12 flex flex-col gap-4 border-black ${
+                  index === 0 ? "border-b sm:border-r" : 
+                  index === 1 ? "border-b" : 
+                  index === 2 ? "border-b sm:border-b-0 sm:border-r" : ""
+                }`}
+              >
+                <h4 className="text-sm font-black uppercase tracking-widest text-black">
+                  {feature.title}
+                </h4>
+                <p className="text-xs text-gray-500 font-medium leading-relaxed uppercase tracking-wider">
+                  {feature.desc}
+                </p>
+              </div>
+            ))}
+          </div>
         </section>
       </main>
 
