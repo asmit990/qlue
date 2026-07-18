@@ -82,7 +82,7 @@ export default function Dashboard() {
       setDatasetTableName(dataset.id);
 
       const token = localStorage.getItem("token") || "";
-      ask(question, dataset.columns, dataset.id, token);
+      ask(question, dataset.schema, dataset.id, token);
     })();
 
     return () => {
@@ -120,7 +120,11 @@ export default function Dashboard() {
             New Analysis
           </button>
           
-          <SharingButton question={question} />
+          <SharingButton
+            question={question}
+            chartType={chartType ?? "bar"}
+            chartData={rows ?? []}
+          />
         </div>
       </nav>
 
@@ -270,4 +274,4 @@ export default function Dashboard() {
     </div>
   );
 }
-// CHANGED: Removed the fixed height on the main section to allow for natural stacking on mobile and row layout on desktop. Added min-h to chart area to prevent collapsing on mobile. yaayayayayayayay
+// Removed the fixed height on the main section to allow for natural stacking on mobile and row layout on desktop. Added min-h to chart area to prevent collapsing on mobile.
