@@ -111,8 +111,12 @@ function inferColumnType(
 }
 
 function coerceValueForColumn(value: unknown, type: DatasetColumn["type"]): unknown {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
   if (type !== "number") {
-    return value;
+    return String(value);
   }
 
   if (typeof value === "number") {

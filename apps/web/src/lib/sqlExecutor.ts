@@ -13,9 +13,6 @@ async function getSqlJs() {
   return SQL;
 }
 
-// SQLite can still hand numeric results back as strings depending on the
-// expression/result shape. Recharts needs actual numbers for aggregates and
-// scales, so coerce clean numeric strings while leaving labels untouched.
 function coerceValue(val: any): any {
   if (typeof val !== "string" || val.trim() === "") return val;
   const num = Number(val);
@@ -68,7 +65,7 @@ async function createSqlJsDatabaseForDataset(dataset: Dataset): Promise<SqlJsDat
 
   try {
     for (const row of dataset.rows) {
-      stmt.run(columns.map((column) => row[column.name]));
+      stmt.run(columns.map((column) => row[column.name] ?? null));
     }
   } finally {
     stmt.free();

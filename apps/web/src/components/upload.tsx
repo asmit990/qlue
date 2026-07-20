@@ -7,7 +7,6 @@ interface Props {
 }
 
 export default function CsvUploadButton({ onUpload }: Props) {
-
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -16,8 +15,10 @@ export default function CsvUploadButton({ onUpload }: Props) {
       const dataset = await parseAndStoreCSV(file);
       onUpload(dataset);
     } catch (err: any) {
-      console.error("Failed to parse CSV:", err.message);
-      alert(`Failed to parse CSV: ${err.message}`);
+      console.error("RAW ERROR:", err);
+      console.error("typeof:", typeof err);
+      console.error("stringified:", JSON.stringify(err));
+      alert(`Failed to parse CSV: ${err?.message ?? String(err)}`);
     } finally {
       e.target.value = "";
     }
