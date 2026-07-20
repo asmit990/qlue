@@ -78,7 +78,7 @@ export default function Register() {
         <div className="flex items-center gap-4 md:gap-6">
           <span 
             onClick={() => navi("/")} 
-            className="text-xl md:text-2xl font-black tracking-tighter uppercase cursor-pointer hover:opacity-50 transition-opacity"
+            className="text-xl md:text-2xl font-black tracking-tighter  cursor-pointer hover:opacity-50 transition-opacity"
           >
             Qlue
           </span>

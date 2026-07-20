@@ -62,14 +62,20 @@ export function useWebSocket() {
 
                 useChartStore.getState().setStatus(data.status);
 
-                if (data.status === "generated" || (data.status === "ready_for_local_execution" && data.sql)) {
+                if (data.status === "generated" || data.status === "ready_for_local_execution") {
                     if (data.sql) setSql(data.sql);
                     if (data.chartType) useChartStore.getState().setChartType(data.chartType as ChartType);
                 }
 
-                if (typeof data.sql === "string") {
+                if (data.status === "ready_for_local_execution") {
                     const queryMessage = data as QueryReadyMessage;
                     const datasetId = datasetIdRef.current;
+                    if (!queryMessage.sql?.trim()) {
+                        console.error("Server marked query ready without SQL");
+                        useChartStore.getState().setStatus("error");
+                        return;
+                    }
+
                     if (!datasetId) {
                         console.error("No datasetId available for local execution");
                         useChartStore.getState().setStatus("error");

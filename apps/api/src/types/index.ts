@@ -1,4 +1,4 @@
-export type ChartType = "bar" | "line" | "pie";
+export type ChartType = "bar" | "line" | "pie" | "area" | "scatter" | "radar";
 
 export interface QueryResponse {
   chartType: ChartType;
