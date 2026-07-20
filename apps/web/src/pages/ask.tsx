@@ -94,7 +94,7 @@ export default function Ask() {
         <aside className="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-black bg-white/60 backdrop-blur-sm flex flex-col">
           <div className="p-8 border-b border-black bg-white">
             <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-black">
-              Query Injectors
+              Query History
             </h2>
             <p className="text-[9px] font-bold tracking-widest uppercase text-gray-400 mt-2">
               Select a pre-configured node
@@ -105,6 +105,14 @@ export default function Ask() {
             <QuerySidebar
               onSelect={(item: any) => {
                 setQuestion(item.question);
+                if (activeDataset) {
+                  navigate("/dashboard", {
+                    state: {
+                      datasetId: activeDataset.id,
+                      question: item.question,
+                    },
+                  });
+                }
               }}
             />
           </div>
