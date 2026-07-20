@@ -55,7 +55,7 @@ export default function ForgetPassword() {
       {/* Top Navigation Bar */}
       <nav className="relative z-20 border-b border-black bg-white flex items-center justify-between p-4 md:px-10 md:h-20">
         <div className="flex items-center gap-4 md:gap-6">
-          <span className="text-xl md:text-2xl font-black tracking-tighter uppercase">Qlue</span>
+          <span className="text-xl md:text-2xl font-black tracking-tighter ">Qlue</span>
           <div className="h-6 w-px bg-black/10 hidden md:block" />
           <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 hidden md:block">
             System Interface // Reset
