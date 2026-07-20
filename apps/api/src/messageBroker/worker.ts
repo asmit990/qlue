@@ -39,7 +39,7 @@ export const processQueryJob = async (payload: QueryJob, wss: WebSocketServer) =
         `,
         [userId, question, sql, chartType]
       );
-      addToHistory(userId, {
+      addToHistory(String(userId), {
         question,
         sql,
         chartType,
