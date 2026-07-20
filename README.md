@@ -83,7 +83,7 @@ RabbitMQ queues all incoming user queries so multiple users are handled reliably
 WebSocket streams real-time status updates (`thinking`, `generated`, `ready_for_local_execution`, `error`) back to the UI as each job progresses through the pipeline.
 
 **Query History**
-Every query is persisted to PostgreSQL and grouped by date, so past questions can be revisited and re-run.
+Every query is persisted to PostgreSQL, grouped by date, and displayed in an inline sidebar, making it easy to rerun past questions with a single click.
 
 **Authentication**
 Full JWT-based auth system with register, login, forgot password, and email-based password reset via Nodemailer, with Joi request validation.
@@ -119,7 +119,7 @@ qlue/
         components/       charts.tsx        chart rendering
                           queryRunner.tsx   runs generated SQL locally
                           upload.tsx        CSV upload
-                          sidebar.tsx       query history sidebar
+                          sidebar.tsx       inline query history sidebar
                           ProtectedRoute    auth guard
         lib/              sqlExecutor.ts    sql.js (WASM) query execution
                           csvParser.ts      PapaParse CSV parsing
