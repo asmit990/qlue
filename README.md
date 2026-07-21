@@ -2,6 +2,8 @@
 
 Qlue is a full-stack, AI-powered data visualization engine that transforms natural language prompts into interactive business dashboards. No SQL, no complex BI tools — just ask your data a question and get instant visual insights.
 
+Available as a web app and, via Capacitor, as a native **Android and iOS app** running the same React codebase.
+
 ---
 
 ## The Problem
@@ -42,6 +44,11 @@ PostgreSQL  ──  users + query history        (raw CSV data never leaves the 
 
 Full architecture diagram: see ![Description](qlue_system_workflow.svg)
 
+**Cross-platform delivery:** the same `apps/web` React build is wrapped natively via [Capacitor](https://capacitorjs.com), producing installable Android and iOS apps from a single codebase with no UI rewrite.
+
+![Qlue running on Android](./android.png)
+*Qlue's landing page rendering natively on an Android emulator (Pixel 8, API 37) via Capacitor.*
+
 ---
 
 ## Tech Stack
@@ -49,6 +56,7 @@ Full architecture diagram: see ![Description](qlue_system_workflow.svg)
 | Layer | Technology |
 |---|---|
 | Frontend | React 19 (Vite), Tailwind CSS, Recharts, Chart.js, Framer Motion |
+| Mobile | Capacitor (Android + iOS), wrapping the React web build natively |
 | Backend | Node.js, Express 5, TypeScript |
 | AI Engine | Google Gemini 2.5 Flash |
 | In-browser SQL | sql.js (SQLite compiled to WASM) |
@@ -88,12 +96,19 @@ Every query is persisted to PostgreSQL, grouped by date, and displayed in an inl
 **Authentication**
 Full JWT-based auth system with register, login, forgot password, and email-based password reset via Nodemailer, with Joi request validation.
 
+**Native Mobile App**
+The same React web build ships as a native Android and iOS app via Capacitor — one frontend codebase, three deployment targets (web, Android, iOS), with no separate mobile rewrite.
+
 ---
 
 ## Project Structure
 
 ```
 qlue/
+  android/                                  Capacitor-generated native Android project
+  ios/                                      Capacitor-generated native iOS project
+  capacitor.config.ts                       Capacitor config (webDir -> apps/web/dist)
+
   apps/
     api/                                    Express + WebSocket backend
       src/
@@ -114,7 +129,7 @@ qlue/
                           oauth/            OAuth providers (WIP)
         index.ts                            Express + WebSocket server
 
-    web/                                    React (Vite) frontend
+    web/                                    React (Vite) frontend — also the source for the mobile app
       src/
         components/       charts.tsx        chart rendering
                           queryRunner.tsx   runs generated SQL locally
@@ -150,6 +165,7 @@ qlue/
 - Docker (for RabbitMQ)
 - PostgreSQL database (local or hosted)
 - Google Gemini API key — free at aistudio.google.com
+- For mobile builds: Android Studio (Android) and/or Xcode (iOS, macOS only)
 
 ### Installation
 
@@ -184,7 +200,7 @@ docker run -d --name rabbitmq \
   rabbitmq:3-management
 ```
 
-### Run
+### Run (Web)
 
 ```bash
 # From the repo root (Turborepo runs all apps)
@@ -196,6 +212,26 @@ cd apps/web && pnpm dev   # frontend
 ```
 
 The Postgres tables (`users`, `query_history`) are created automatically on API startup.
+
+### Run (Mobile — Android / iOS)
+
+The mobile app is the `apps/web` frontend, wrapped natively via Capacitor. Build the web app first, then sync it into the native projects:
+
+```bash
+# Build the web frontend
+cd apps/web
+pnpm build
+
+# From the repo root, sync the build into native projects
+cd ../..
+npx cap sync
+
+# Open in the native IDE and run on a simulator/emulator or device
+npx cap open android   # requires Android Studio
+npx cap open ios       # requires Xcode (macOS only)
+```
+
+> Re-run `pnpm build` (in `apps/web`) + `npx cap sync` (from repo root) any time the frontend changes, to push the update into the native app shells.
 
 ---
 
@@ -209,6 +245,8 @@ The Postgres tables (`users`, `query_history`) are created automatically on API 
 6. The backend streams `ready_for_local_execution` ({ sql, chartType }) back over WebSocket and records the query in PostgreSQL
 7. The browser runs the SQL locally against the loaded CSV via sql.js (WASM)
 8. Recharts / Chart.js renders the dashboard instantly — raw data never left the client
+
+This flow is identical across web, Android, and iOS — the native app shell (Capacitor) simply hosts the same frontend inside a native WebView.
 
 ---
 
