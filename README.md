@@ -217,6 +217,7 @@ The Postgres tables (`users`, `query_history`) are created automatically on API 
 
 The mobile app is the `apps/web` frontend, wrapped natively via Capacitor. Build the web app first, then sync it into the native projects:
 
+[![snapshot](./andriodtest.png)]
 ```bash
 # Build the web frontend
 cd apps/web
