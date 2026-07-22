@@ -13,6 +13,7 @@
     "@base-ui/react": "^1.4.1",
     "@fontsource-variable/geist": "^5.2.8",
     "@tailwindcss/forms": "^0.5.11",
+    "@xyflow/react": "^12.11.2",
     "axios": "^1.15.2",
     "chart.js": "^4.5.1",
     "class-variance-authority": "^0.7.1",
