@@ -1,0 +1,13 @@
+node_modules
+.pnpm-store
+.git
+.turbo
+**/.env
+**/.env.*
+apps/api/qlue.db
+apps/api/dist
+scratch
+android
+ios
+*.png
+*.log

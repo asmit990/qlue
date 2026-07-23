@@ -37,7 +37,7 @@ export function PropertyPanel() {
             <label className="text-sm font-semibold text-gray-700">Select Table</label>
             <select
               className="border border-gray-300 rounded p-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
-              value={data.tableName || ''}
+              value={typeof data.tableName === 'string' ? data.tableName : ''}
               onChange={(e) => handleChange('tableName', e.target.value)}
             >
               <option value="" disabled>Select a loaded CSV...</option>
@@ -58,7 +58,7 @@ export function PropertyPanel() {
               <label className="text-sm font-semibold text-gray-700">Join Type</label>
               <select
                 className="border border-gray-300 rounded p-2 text-sm bg-white"
-                value={data.joinType || 'INNER'}
+                value={typeof data.joinType === 'string' ? data.joinType : 'INNER'}
                 onChange={(e) => handleChange('joinType', e.target.value)}
               >
                 <option value="INNER">INNER JOIN</option>
@@ -72,7 +72,7 @@ export function PropertyPanel() {
                 type="text"
                 placeholder="e.g. node_1.id = node_2.user_id"
                 className="border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none font-mono"
-                value={data.condition || ''}
+                value={typeof data.condition === 'string' ? data.condition : ''}
                 onChange={(e) => handleChange('condition', e.target.value)}
               />
               <p className="text-xs text-gray-400">Use the exact node IDs or table aliases.</p>
@@ -88,7 +88,7 @@ export function PropertyPanel() {
               rows={3}
               placeholder="e.g. status = 'active' AND age > 18"
               className="border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none font-mono"
-              value={data.filterCondition || ''}
+              value={typeof data.filterCondition === 'string' ? data.filterCondition : ''}
               onChange={(e) => handleChange('filterCondition', e.target.value)}
             />
           </div>
@@ -103,7 +103,7 @@ export function PropertyPanel() {
                 rows={3}
                 placeholder="e.g. Group by state and calculate total revenue"
                 className="border border-gray-300 rounded p-2 text-sm focus:ring-2 focus:ring-green-500 outline-none"
-                value={data.prompt || ''}
+                value={typeof data.prompt === 'string' ? data.prompt : ''}
                 onChange={(e) => handleChange('prompt', e.target.value)}
               />
               <button 
