@@ -28,7 +28,7 @@ export const processQueryJob = async (payload: QueryJob, wss: WebSocketServer) =
 
   try {
     client?.send(JSON.stringify({ status: "thinking" }));
-    const { sql, chartType } = await generateSQL(question, schema, []);
+    const { sql, chartType } = await generateSQL(question, schema);
     client?.send(JSON.stringify({ status: "generated", sql, chartType }));
     try {
       await pool.query(
